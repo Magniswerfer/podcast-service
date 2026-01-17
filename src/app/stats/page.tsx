@@ -87,67 +87,67 @@ export default function StatsPage() {
       </h1>
 
       {/* Overview Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <Card hover={false} className="p-6">
-          <p className="text-sm text-[#a0a0a0] mb-2">Total Listening Time</p>
-          <p className="text-2xl font-bold text-white">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6 mb-8">
+        <Card hover={false} className="p-4 sm:p-6">
+          <p className="text-xs sm:text-sm text-[#a0a0a0] mb-1 sm:mb-2">Total Listening Time</p>
+          <p className="text-lg sm:text-2xl font-bold text-white">
             {formatTime(stats.totalListeningTimeSeconds)}
           </p>
         </Card>
-        <Card hover={false} className="p-6">
-          <p className="text-sm text-[#a0a0a0] mb-2">Episodes Completed</p>
-          <p className="text-2xl font-bold text-white">
+        <Card hover={false} className="p-4 sm:p-6">
+          <p className="text-xs sm:text-sm text-[#a0a0a0] mb-1 sm:mb-2">Episodes Completed</p>
+          <p className="text-lg sm:text-2xl font-bold text-white">
             {stats.totalEpisodesCompleted}
           </p>
         </Card>
-        <Card hover={false} className="p-6">
-          <p className="text-sm text-[#a0a0a0] mb-2">In Progress</p>
-          <p className="text-2xl font-bold text-white">
+        <Card hover={false} className="p-4 sm:p-6">
+          <p className="text-xs sm:text-sm text-[#a0a0a0] mb-1 sm:mb-2">In Progress</p>
+          <p className="text-lg sm:text-2xl font-bold text-white">
             {stats.totalEpisodesInProgress}
           </p>
         </Card>
-        <Card hover={false} className="p-6">
-          <p className="text-sm text-[#a0a0a0] mb-2">Subscribed</p>
-          <p className="text-2xl font-bold text-white">
+        <Card hover={false} className="p-4 sm:p-6">
+          <p className="text-xs sm:text-sm text-[#a0a0a0] mb-1 sm:mb-2">Subscribed</p>
+          <p className="text-lg sm:text-2xl font-bold text-white">
             {stats.totalPodcastsSubscribed}
           </p>
         </Card>
       </div>
 
       {/* Average Daily Listening */}
-      <Card className="p-6 mb-8">
-        <h2 className="text-xl font-semibold text-white mb-2">
+      <Card className="p-4 sm:p-6 mb-8">
+        <h2 className="text-lg sm:text-xl font-semibold text-white mb-2">
           Average Daily Listening Time
         </h2>
-        <p className="text-3xl font-bold text-[#FF3B30]">
+        <p className="text-2xl sm:text-3xl font-bold text-[#FF3B30]">
           {formatTime(stats.averageDailyListeningTimeSeconds)}
         </p>
       </Card>
 
       {/* Top Podcasts */}
-      <Card className="p-6">
-        <h2 className="text-xl font-semibold text-white mb-4">
+      <Card className="p-4 sm:p-6">
+        <h2 className="text-lg sm:text-xl font-semibold text-white mb-4">
           Top Podcasts
         </h2>
         {stats.topPodcasts.length === 0 ? (
           <p className="text-[#a0a0a0]">No data available</p>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-3 sm:space-y-4">
             {stats.topPodcasts.map((podcast, index) => (
-              <div key={podcast.podcastId} className="flex items-center space-x-4 p-3 rounded-[12px] hover:bg-[#252525] transition-colors">
-                <span className={`text-2xl font-bold w-8 ${
+              <div key={podcast.podcastId} className="flex items-center gap-3 sm:gap-4 p-2 sm:p-3 rounded-[12px] hover:bg-[#252525] transition-colors">
+                <span className={`text-xl sm:text-2xl font-bold w-6 sm:w-8 text-center ${
                   index === 0 ? 'text-[#FF3B30]' : 'text-[#a0a0a0]'
                 }`}>
                   {index + 1}
                 </span>
-                <div className="flex-1">
-                  <h3 className="font-medium text-white">
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-medium text-white truncate text-sm sm:text-base">
                     {podcast.podcastTitle}
                   </h3>
-                  <div className="flex items-center space-x-4 text-sm text-[#a0a0a0] mt-1">
+                  <div className="flex items-center gap-2 sm:gap-4 text-xs sm:text-sm text-[#a0a0a0] mt-1">
                     <span>{formatTime(podcast.listeningTimeSeconds)}</span>
                     <span>•</span>
-                    <span>{podcast.episodesCompleted} episodes</span>
+                    <span>{podcast.episodesCompleted} ep</span>
                   </div>
                 </div>
               </div>

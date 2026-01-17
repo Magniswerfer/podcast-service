@@ -44,10 +44,10 @@ export function Player() {
     };
 
     return (
-        <div className="fixed bottom-4 left-4 right-4 lg:left-24 lg:right-4 bg-[#1f1f1f] border border-[#2a2a2a] rounded-[20px] shadow-[0_-4px_24px_rgba(0,0,0,0.4)] z-50 transition-all duration-300">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <div className="fixed bottom-20 left-2 right-2 sm:left-4 sm:right-4 lg:bottom-4 lg:left-24 lg:right-4 bg-[#1f1f1f] border border-[#2a2a2a] rounded-[16px] sm:rounded-[20px] shadow-[0_-4px_24px_rgba(0,0,0,0.4)] z-40 transition-all duration-300">
+            <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-3 sm:py-4">
                 {/* Progress Bar - Full Width */}
-                <div className="mb-4">
+                <div className="mb-3 sm:mb-4">
                     <ProgressBar
                         currentTime={currentTime}
                         duration={duration}
@@ -55,10 +55,10 @@ export function Player() {
                     />
                 </div>
 
-                <div className="flex items-center space-x-4">
-                    {/* Episode Artwork - Clickable */}
+                <div className="flex items-center gap-2 sm:gap-4">
+                    {/* Episode Artwork - Clickable, smaller on mobile */}
                     <div
-                        className="flex-shrink-0 cursor-pointer"
+                        className="shrink-0 cursor-pointer"
                         onClick={handlePlayerClick}
                     >
                         <img
@@ -66,7 +66,7 @@ export function Player() {
                                 currentEpisode.podcast.artworkUrl ||
                                 "/placeholder-artwork.png"}
                             alt={currentEpisode.title}
-                            className="h-16 w-16 rounded-[16px] object-cover shadow-lg"
+                            className="h-12 w-12 sm:h-16 sm:w-16 rounded-[12px] sm:rounded-[16px] object-cover shadow-lg"
                         />
                     </div>
 
@@ -75,7 +75,7 @@ export function Player() {
                         className="flex-1 min-w-0 cursor-pointer"
                         onClick={handlePlayerClick}
                     >
-                        <p className="text-sm font-medium text-white truncate">
+                        <p className="text-xs sm:text-sm font-medium text-white truncate">
                             {currentEpisode.title}
                         </p>
                         <p className="text-xs text-[#a0a0a0] truncate">
@@ -83,12 +83,13 @@ export function Player() {
                         </p>
                     </div>
 
-                    {/* Controls */}
-                    <div className="flex items-center space-x-2">
+                    {/* Controls - simplified on mobile */}
+                    <div className="flex items-center gap-1 sm:gap-2">
+                        {/* Skip back - hidden on mobile */}
                         <Tooltip content="Skip backward 15s" position="top">
                             <button
                                 onClick={skipBackward}
-                                className="p-2 rounded-full text-[#a0a0a0] hover:text-white hover:bg-[#252525] transition-all duration-200 active:scale-95"
+                                className="hidden sm:flex p-2 rounded-full text-[#a0a0a0] hover:text-white hover:bg-[#252525] transition-all duration-200 active:scale-95"
                             >
                                 <BackwardIcon className="h-5 w-5" />
                             </button>
@@ -99,36 +100,39 @@ export function Player() {
                         >
                             <button
                                 onClick={togglePlayPause}
-                                className="p-3 rounded-full bg-[#FF3B30] hover:bg-[#FF5247] text-white shadow-[0_2px_8px_rgba(255,59,48,0.3)] hover:shadow-[0_4px_12px_rgba(255,59,48,0.4)] transition-all duration-200 active:scale-95"
+                                className="p-2.5 sm:p-3 rounded-full bg-[#FF3B30] hover:bg-[#FF5247] text-white shadow-[0_2px_8px_rgba(255,59,48,0.3)] hover:shadow-[0_4px_12px_rgba(255,59,48,0.4)] transition-all duration-200 active:scale-95"
                             >
                                 {isPlaying
-                                    ? <PauseIcon className="h-6 w-6" />
-                                    : <PlayIcon className="h-6 w-6" />}
+                                    ? <PauseIcon className="h-5 w-5 sm:h-6 sm:w-6" />
+                                    : <PlayIcon className="h-5 w-5 sm:h-6 sm:w-6" />}
                             </button>
                         </Tooltip>
+                        {/* Skip forward - hidden on mobile */}
                         <Tooltip content="Skip forward 15s" position="top">
                             <button
                                 onClick={skipForward}
-                                className="p-2 rounded-full text-[#a0a0a0] hover:text-white hover:bg-[#252525] transition-all duration-200 active:scale-95"
+                                className="hidden sm:flex p-2 rounded-full text-[#a0a0a0] hover:text-white hover:bg-[#252525] transition-all duration-200 active:scale-95"
                             >
                                 <ForwardIcon className="h-5 w-5" />
                             </button>
                         </Tooltip>
                     </div>
 
-                    {/* Speed & Volume Controls */}
-                    <Controls
-                        playbackRate={playbackRate}
-                        onPlaybackRateChange={setPlaybackRate}
-                        volume={volume}
-                        onVolumeChange={setVolume}
-                    />
+                    {/* Speed & Volume Controls - hidden on mobile */}
+                    <div className="hidden md:block">
+                        <Controls
+                            playbackRate={playbackRate}
+                            onPlaybackRateChange={setPlaybackRate}
+                            volume={volume}
+                            onVolumeChange={setVolume}
+                        />
+                    </div>
 
-                    {/* Queue Toggle */}
+                    {/* Queue Toggle - hidden on mobile */}
                     <Tooltip content="Queue" position="top">
                         <button
                             onClick={() => setShowQueue(!showQueue)}
-                            className={`p-2 rounded-full text-[#a0a0a0] hover:text-white hover:bg-[#252525] transition-all duration-200 active:scale-95 ${
+                            className={`hidden sm:flex p-2 rounded-full text-[#a0a0a0] hover:text-white hover:bg-[#252525] transition-all duration-200 active:scale-95 ${
                                 showQueue ? "text-[#FF3B30] bg-[#252525]" : ""
                             }`}
                         >
@@ -138,9 +142,9 @@ export function Player() {
                 </div>
             </div>
 
-            {/* Queue Preview - Expands below player controls */}
+            {/* Queue Preview - Expands below player controls, hidden on mobile */}
             {showQueue && (
-                <div className="border-t border-[#2a2a2a] pt-4 pb-4">
+                <div className="hidden sm:block border-t border-[#2a2a2a] pt-4 pb-4">
                     <QueuePreview onClose={() => setShowQueue(false)} />
                 </div>
             )}

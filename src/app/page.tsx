@@ -140,28 +140,28 @@ export default function Dashboard() {
 
       {/* Stats Overview */}
       {stats && (
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <Card hover={false} className="p-6">
-            <p className="text-sm text-[#a0a0a0] mb-2">Total Listening Time</p>
-            <p className="text-2xl font-bold text-white">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6 mb-8">
+          <Card hover={false} className="p-4 sm:p-6">
+            <p className="text-xs sm:text-sm text-[#a0a0a0] mb-1 sm:mb-2">Total Listening Time</p>
+            <p className="text-lg sm:text-2xl font-bold text-white">
               {formatTime(stats.totalListeningTimeSeconds || 0)}
             </p>
           </Card>
-          <Card hover={false} className="p-6">
-            <p className="text-sm text-[#a0a0a0] mb-2">Episodes Completed</p>
-            <p className="text-2xl font-bold text-white">
+          <Card hover={false} className="p-4 sm:p-6">
+            <p className="text-xs sm:text-sm text-[#a0a0a0] mb-1 sm:mb-2">Episodes Completed</p>
+            <p className="text-lg sm:text-2xl font-bold text-white">
               {stats.totalEpisodesCompleted || 0}
             </p>
           </Card>
-          <Card hover={false} className="p-6">
-            <p className="text-sm text-[#a0a0a0] mb-2">In Progress</p>
-            <p className="text-2xl font-bold text-white">
+          <Card hover={false} className="p-4 sm:p-6">
+            <p className="text-xs sm:text-sm text-[#a0a0a0] mb-1 sm:mb-2">In Progress</p>
+            <p className="text-lg sm:text-2xl font-bold text-white">
               {stats.totalEpisodesInProgress || 0}
             </p>
           </Card>
-          <Card hover={false} className="p-6">
-            <p className="text-sm text-[#a0a0a0] mb-2">Subscribed</p>
-            <p className="text-2xl font-bold text-white">
+          <Card hover={false} className="p-4 sm:p-6">
+            <p className="text-xs sm:text-sm text-[#a0a0a0] mb-1 sm:mb-2">Subscribed</p>
+            <p className="text-lg sm:text-2xl font-bold text-white">
               {stats.totalPodcastsSubscribed || 0}
             </p>
           </Card>
@@ -176,28 +176,28 @@ export default function Dashboard() {
         {recentEpisodes.length === 0 ? (
           <p className="text-[#a0a0a0]">No recent episodes</p>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {recentEpisodes.map((episode) => (
               <Link
                 key={episode.id}
                 href={`/podcasts/${episode.podcast.id}`}
               >
-                <Card interactive className="p-4">
-                  <div className="flex space-x-4">
+                <Card interactive className="p-3 sm:p-4">
+                  <div className="flex items-center gap-3 sm:gap-4">
                     <img
                       src={episode.artworkUrl || episode.podcast.artworkUrl || '/placeholder-artwork.png'}
                       alt={episode.title}
-                      className="h-20 w-20 rounded-[12px] object-cover flex-shrink-0"
+                      className="h-14 w-14 sm:h-20 sm:w-20 rounded-[12px] object-cover shrink-0"
                     />
                     <div className="flex-1 min-w-0">
-                      <p className="font-medium text-white truncate">
+                      <p className="font-medium text-white truncate text-sm sm:text-base">
                         {episode.title}
                       </p>
-                      <p className="text-sm text-[#a0a0a0] truncate">
+                      <p className="text-xs sm:text-sm text-[#a0a0a0] truncate">
                         {episode.podcast.title}
                       </p>
                     </div>
-                    <div className="flex items-center flex-shrink-0">
+                    <div className="flex items-center shrink-0">
                       <Tooltip content="Play" position="left">
                         <Button
                           variant="icon"
@@ -224,31 +224,31 @@ export default function Dashboard() {
         {newEpisodes.length === 0 ? (
           <p className="text-[#a0a0a0]">No new episodes</p>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {newEpisodes.map((episode) => (
               <Link
                 key={episode.id}
                 href={`/podcasts/${episode.podcast.id}`}
               >
-                <Card interactive className="p-4">
-                  <div className="flex space-x-4">
+                <Card interactive className="p-3 sm:p-4">
+                  <div className="flex items-center gap-3 sm:gap-4">
                     <img
                       src={episode.artworkUrl || episode.podcast.artworkUrl || '/placeholder-artwork.png'}
                       alt={episode.title}
-                      className="h-20 w-20 rounded-[12px] object-cover flex-shrink-0"
+                      className="h-14 w-14 sm:h-20 sm:w-20 rounded-[12px] object-cover shrink-0"
                     />
                     <div className="flex-1 min-w-0">
-                      <p className="font-medium text-white truncate">
+                      <p className="font-medium text-white truncate text-sm sm:text-base">
                         {episode.title}
                       </p>
-                      <p className="text-sm text-[#a0a0a0] truncate">
+                      <p className="text-xs sm:text-sm text-[#a0a0a0] truncate">
                         {episode.podcast.title}
                       </p>
                       <p className="text-xs text-[#a0a0a0] mt-1">
                         {formatDate(episode.publishedAt, userDateFormat)}
                       </p>
                     </div>
-                    <div className="flex items-center flex-shrink-0">
+                    <div className="flex items-center shrink-0">
                       <Tooltip content="Play" position="left">
                         <Button
                           variant="icon"

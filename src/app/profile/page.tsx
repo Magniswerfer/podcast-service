@@ -273,29 +273,31 @@ export default function ProfilePage() {
       </Card>
 
       {/* API Keys */}
-      <Card hover={false} className="p-6 mb-6">
-        <h2 className="text-xl font-semibold text-white mb-4">API Key</h2>
+      <Card hover={false} className="p-4 sm:p-6 mb-6">
+        <h2 className="text-lg sm:text-xl font-semibold text-white mb-4">API Key</h2>
         <p className="text-sm text-[#a0a0a0] mb-4">
           Use this key to authenticate with external applications (e.g., iOS app, automation scripts).
         </p>
-        <div className="flex items-center space-x-3 mb-4">
-          <div className="flex-1 bg-[#1a1a1a] border border-[#2a2a2a] rounded-[12px] px-4 py-2 font-mono text-sm">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-4">
+          <div className="flex-1 bg-[#1a1a1a] border border-[#2a2a2a] rounded-[12px] px-3 sm:px-4 py-2 font-mono text-xs sm:text-sm overflow-x-auto">
             {showApiKey ? profile.fullApiKey : profile.apiKey}
           </div>
-          <Button
-            variant="icon"
-            onClick={() => setShowApiKey(!showApiKey)}
-            title={showApiKey ? 'Hide API key' : 'Show API key'}
-          >
-            {showApiKey ? <EyeSlashIcon className="h-5 w-5" /> : <EyeIcon className="h-5 w-5" />}
-          </Button>
-          <Button
-            variant="icon"
-            onClick={copyApiKey}
-            title="Copy API key"
-          >
-            {copied ? <CheckIcon className="h-5 w-5 text-green-500" /> : <ClipboardDocumentIcon className="h-5 w-5" />}
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              variant="icon"
+              onClick={() => setShowApiKey(!showApiKey)}
+              title={showApiKey ? 'Hide API key' : 'Show API key'}
+            >
+              {showApiKey ? <EyeSlashIcon className="h-5 w-5" /> : <EyeIcon className="h-5 w-5" />}
+            </Button>
+            <Button
+              variant="icon"
+              onClick={copyApiKey}
+              title="Copy API key"
+            >
+              {copied ? <CheckIcon className="h-5 w-5 text-green-500" /> : <ClipboardDocumentIcon className="h-5 w-5" />}
+            </Button>
+          </div>
         </div>
         <Button
           variant="secondary"

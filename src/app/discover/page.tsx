@@ -116,11 +116,11 @@ export default function DiscoverPage() {
             </h1>
 
             {/* Search */}
-            <Card className="p-6">
-                <h2 className="text-xl font-semibold text-white mb-4">
+            <Card className="p-4 sm:p-6">
+                <h2 className="text-lg sm:text-xl font-semibold text-white mb-4">
                     Search
                 </h2>
-                <div className="flex space-x-4 mb-6">
+                <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-6">
                     <div className="flex-1 relative">
                         <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-[#a0a0a0]" />
                         <input
@@ -134,16 +134,18 @@ export default function DiscoverPage() {
                             className="w-full pl-10 pr-4 py-2 border border-[#2a2a2a] rounded-[12px] bg-[#1a1a1a] text-white placeholder-[#a0a0a0] focus:outline-none focus:border-[#FF3B30] transition-all duration-200"
                         />
                     </div>
-                    <Button
-                        variant="icon"
-                        onClick={() => setShowUrlModal(true)}
-                        className="flex-shrink-0"
-                    >
-                        <LinkIcon className="h-5 w-5" />
-                    </Button>
-                    <Button onClick={handleSearch} disabled={loading}>
-                        {loading ? "Searching..." : "Search"}
-                    </Button>
+                    <div className="flex gap-2 sm:gap-4">
+                        <Button
+                            variant="icon"
+                            onClick={() => setShowUrlModal(true)}
+                            className="shrink-0"
+                        >
+                            <LinkIcon className="h-5 w-5" />
+                        </Button>
+                        <Button onClick={handleSearch} disabled={loading} className="flex-1 sm:flex-none">
+                            {loading ? "Searching..." : "Search"}
+                        </Button>
+                    </div>
                 </div>
 
                 {/* Search Results */}

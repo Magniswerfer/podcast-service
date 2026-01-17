@@ -383,20 +383,58 @@ export default function PodcastDetailPage() {
                                         interactive={false}
                                         className="p-4"
                                     >
-                                        <div className="flex items-start space-x-4">
-                                            <Link
-                                                href={`/player?id=${episode.id}`}
-                                                className="shrink-0"
-                                            >
-                                                <img
-                                                    src={episode.artworkUrl ||
-                                                        podcast.artworkUrl ||
-                                                        "/placeholder-artwork.png"}
-                                                    alt={episode.title}
-                                                    className="w-16 h-16 rounded-[12px] object-cover cursor-pointer hover:opacity-80 transition-opacity"
-                                                />
-                                            </Link>
-                                            <div className="flex-1 min-w-0">
+                                        <div className="flex flex-col sm:flex-row sm:items-start gap-4">
+                                            {/* Top row on mobile: artwork + title + menu */}
+                                            <div className="flex items-start gap-3 sm:contents">
+                                                <Link
+                                                    href={`/player?id=${episode.id}`}
+                                                    className="shrink-0"
+                                                >
+                                                    <img
+                                                        src={episode.artworkUrl ||
+                                                            podcast.artworkUrl ||
+                                                            "/placeholder-artwork.png"}
+                                                        alt={episode.title}
+                                                        className="w-16 h-16 rounded-[12px] object-cover cursor-pointer hover:opacity-80 transition-opacity"
+                                                    />
+                                                </Link>
+                                                <div className="flex-1 min-w-0 sm:hidden">
+                                                    <div className="flex items-start justify-between">
+                                                        <Link
+                                                            href={`/player?id=${episode.id}`}
+                                                            className="flex-1 cursor-pointer"
+                                                        >
+                                                            <h3 className="font-medium text-white hover:text-[#FF3B30] transition-colors line-clamp-2">
+                                                                {episode.title}
+                                                            </h3>
+                                                        </Link>
+                                                        <div className="ml-2 shrink-0">
+                                                            <EpisodeMenu
+                                                                episodeId={episode.id}
+                                                                episode={{
+                                                                    id: episode.id,
+                                                                    title: episode.title,
+                                                                    audioUrl: episode.audioUrl || '',
+                                                                    artworkUrl: episode.artworkUrl,
+                                                                    podcast: {
+                                                                        id: podcast.id,
+                                                                        title: podcast.title,
+                                                                        artworkUrl: podcast.artworkUrl,
+                                                                    },
+                                                                }}
+                                                                progress={episode.progress}
+                                                                durationSeconds={episode.durationSeconds}
+                                                                onMarkedAsPlayed={async () => {
+                                                                    await fetchEpisodes(0, true, filter, sort);
+                                                                }}
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            {/* Desktop: episode info section */}
+                                            <div className="hidden sm:block flex-1 min-w-0">
                                                 <div className="flex items-start justify-between mb-1">
                                                     <Link
                                                         href={`/player?id=${episode.id}`}
@@ -423,7 +461,6 @@ export default function PodcastDetailPage() {
                                                             progress={episode.progress}
                                                             durationSeconds={episode.durationSeconds}
                                                             onMarkedAsPlayed={async () => {
-                                                                // Refresh episodes list with current filter/sort
                                                                 await fetchEpisodes(0, true, filter, sort);
                                                             }}
                                                         />
@@ -487,15 +524,80 @@ export default function PodcastDetailPage() {
                                                     </span>
                                                     {episode.durationSeconds && (
                                                         <span>
-                                                            {formatDuration(
-                                                                episode
-                                                                    .durationSeconds,
-                                                            )}
+                                                            {formatDuration(episode.durationSeconds)}
                                                         </span>
                                                     )}
                                                 </div>
                                             </div>
-                                            <div className="flex flex-col gap-2 shrink-0 min-w-48 justify-between">
+                                            
+                                            {/* Mobile: description, progress, and metadata */}
+                                            <div className="sm:hidden">
+                                                {(episode.descriptionPlain || episode.description) && (
+                                                    <p className="text-sm text-[#a0a0a0] line-clamp-2 mb-2">
+                                                        {episode.descriptionPlain || stripHtml(episode.description || "")}
+                                                    </p>
+                                                )}
+                                                <div className="mb-2">
+                                                    {isCompleted && episode.durationSeconds ? (
+                                                        <>
+                                                            <div className="w-full bg-[#2a2a2a] rounded-full h-1.5 mb-1">
+                                                                <div
+                                                                    className="bg-[#FF3B30] h-1.5 rounded-full transition-all duration-300"
+                                                                    style={{ width: '100%' }}
+                                                                />
+                                                            </div>
+                                                            <div className="flex items-center justify-between text-xs text-[#a0a0a0]">
+                                                                <span>
+                                                                    {formatTime(episode.durationSeconds)} / {formatTime(episode.durationSeconds)}
+                                                                </span>
+                                                                <span className="text-[#FF3B30]">Completed</span>
+                                                            </div>
+                                                        </>
+                                                    ) : hasProgress && episode.durationSeconds ? (
+                                                        <>
+                                                            <div className="w-full bg-[#2a2a2a] rounded-full h-1.5 mb-1">
+                                                                <div
+                                                                    className="bg-[#FF3B30] h-1.5 rounded-full transition-all duration-300"
+                                                                    style={{ width: `${progressPercentage}%` }}
+                                                                />
+                                                            </div>
+                                                            <div className="flex items-center justify-between text-xs text-[#a0a0a0]">
+                                                                <span>
+                                                                    {formatTime(episode.progress!.positionSeconds)} / {formatTime(episode.durationSeconds)}
+                                                                </span>
+                                                                <span>
+                                                                    {Math.round(progressPercentage)}% complete
+                                                                </span>
+                                                            </div>
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <div className="w-full bg-[#2a2a2a] rounded-full h-1.5 mb-1">
+                                                                <div className="h-1.5 rounded-full" />
+                                                            </div>
+                                                            <div className="flex items-center justify-between text-xs text-[#a0a0a0]">
+                                                                <span>
+                                                                    {episode.durationSeconds ? formatTime(episode.durationSeconds) : "Duration unknown"}
+                                                                </span>
+                                                                <span>Not started</span>
+                                                            </div>
+                                                        </>
+                                                    )}
+                                                </div>
+                                                <div className="flex items-center space-x-4 text-xs text-[#a0a0a0] mb-3">
+                                                    <span>
+                                                        {formatDate(episode.publishedAt, userDateFormat)}
+                                                    </span>
+                                                    {episode.durationSeconds && (
+                                                        <span>
+                                                            {formatDuration(episode.durationSeconds)}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            </div>
+                                            
+                                            {/* Action buttons - full width on mobile, fixed width on desktop */}
+                                            <div className="flex flex-col gap-2 sm:shrink-0 sm:w-40">
                                                 <Tooltip
                                                     content={hasProgress ? "Continue playing" : "Play"}
                                                     position="left"
@@ -505,50 +607,28 @@ export default function PodcastDetailPage() {
                                                         size="sm"
                                                         onClick={async () => {
                                                             try {
-                                                                const res =
-                                                                    await fetch(
-                                                                        `/api/episodes/${episode.id}`,
-                                                                    );
+                                                                const res = await fetch(`/api/episodes/${episode.id}`);
                                                                 if (!res.ok) {
-                                                                    throw new Error(
-                                                                        "Failed to fetch episode",
-                                                                    );
+                                                                    throw new Error("Failed to fetch episode");
                                                                 }
-                                                                const data =
-                                                                    await res
-                                                                        .json();
-                                                                // If episode has progress, continue from that position
+                                                                const data = await res.json();
                                                                 const startPosition = hasProgress 
                                                                     ? episode.progress!.positionSeconds 
                                                                     : undefined;
                                                                 await playEpisode({
                                                                     id: data.id,
-                                                                    title:
-                                                                        data.title,
-                                                                    audioUrl:
-                                                                        data.audioUrl,
-                                                                    artworkUrl:
-                                                                        data.artworkUrl,
+                                                                    title: data.title,
+                                                                    audioUrl: data.audioUrl,
+                                                                    artworkUrl: data.artworkUrl,
                                                                     podcast: {
-                                                                        id: data
-                                                                            .podcast
-                                                                            .id,
-                                                                        title:
-                                                                            data.podcast
-                                                                                .title,
-                                                                        artworkUrl:
-                                                                            data.podcast
-                                                                                .artworkUrl,
+                                                                        id: data.podcast.id,
+                                                                        title: data.podcast.title,
+                                                                        artworkUrl: data.podcast.artworkUrl,
                                                                     },
                                                                 }, startPosition);
                                                             } catch (error) {
-                                                                console.error(
-                                                                    "Error fetching episode:",
-                                                                    error,
-                                                                );
-                                                                setAlertMessage(
-                                                                    "Failed to load episode. Please try again.",
-                                                                );
+                                                                console.error("Error fetching episode:", error);
+                                                                setAlertMessage("Failed to load episode. Please try again.");
                                                             }
                                                         }}
                                                         className="w-full"

@@ -201,19 +201,59 @@ export default function QueuePage() {
                                             : ""
                                     }`}
                                 >
-                                    <div className="flex items-center space-x-4">
-                                        <span className="text-[#a0a0a0] font-mono w-8 text-center">
-                                            {item.position + 1}
-                                        </span>
-                                        <img
-                                            src={item.episode.artworkUrl ||
-                                                item.episode.podcast
-                                                    .artworkUrl ||
-                                                "/placeholder-artwork.png"}
-                                            alt={item.episode.title}
-                                            className="h-16 w-16 rounded-[12px] object-cover shrink-0"
-                                        />
-                                        <div className="flex-1 min-w-0">
+                                    <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+                                        {/* Top row on mobile: position + artwork + title + menu */}
+                                        <div className="flex items-center gap-3 sm:contents">
+                                            <span className="text-[#a0a0a0] font-mono w-6 sm:w-8 text-center shrink-0">
+                                                {item.position + 1}
+                                            </span>
+                                            <img
+                                                src={item.episode.artworkUrl ||
+                                                    item.episode.podcast.artworkUrl ||
+                                                    "/placeholder-artwork.png"}
+                                                alt={item.episode.title}
+                                                className="h-12 w-12 sm:h-16 sm:w-16 rounded-[12px] object-cover shrink-0"
+                                            />
+                                            <div className="flex-1 min-w-0 sm:hidden">
+                                                <div className="flex items-start justify-between">
+                                                    <h3 className="font-medium text-white line-clamp-2">
+                                                        {item.episode.title}
+                                                        {isCurrentlyPlaying && (
+                                                            <span className="ml-2 text-xs text-[#FF3B30]">
+                                                                (Now Playing)
+                                                            </span>
+                                                        )}
+                                                    </h3>
+                                                    <div className="ml-2 shrink-0">
+                                                        <EpisodeMenu
+                                                            episodeId={item.episode.id}
+                                                            episode={{
+                                                                id: item.episode.id,
+                                                                title: item.episode.title,
+                                                                audioUrl: item.episode.audioUrl,
+                                                                artworkUrl: item.episode.artworkUrl,
+                                                                podcast: {
+                                                                    id: item.episode.podcast.id,
+                                                                    title: item.episode.podcast.title,
+                                                                    artworkUrl: item.episode.podcast.artworkUrl,
+                                                                },
+                                                            }}
+                                                            progress={item.episode.progress}
+                                                            durationSeconds={item.episode.durationSeconds}
+                                                            onMarkedAsPlayed={async () => {
+                                                                await loadQueue();
+                                                            }}
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <p className="text-sm text-[#a0a0a0] truncate">
+                                                    {item.episode.podcast.title}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        
+                                        {/* Desktop: full info section */}
+                                        <div className="hidden sm:block flex-1 min-w-0">
                                             <div className="flex items-start justify-between mb-1">
                                                 <h3 className="font-medium text-white truncate">
                                                     {item.episode.title}
@@ -225,37 +265,21 @@ export default function QueuePage() {
                                                 </h3>
                                                 <div className="ml-2 shrink-0">
                                                     <EpisodeMenu
-                                                        episodeId={item.episode
-                                                            .id}
+                                                        episodeId={item.episode.id}
                                                         episode={{
                                                             id: item.episode.id,
-                                                            title:
-                                                                item.episode
-                                                                    .title,
-                                                            audioUrl:
-                                                                item.episode
-                                                                    .audioUrl,
-                                                            artworkUrl:
-                                                                item.episode
-                                                                    .artworkUrl,
+                                                            title: item.episode.title,
+                                                            audioUrl: item.episode.audioUrl,
+                                                            artworkUrl: item.episode.artworkUrl,
                                                             podcast: {
-                                                                id: item.episode
-                                                                    .podcast.id,
-                                                                title:
-                                                                    item.episode
-                                                                        .podcast
-                                                                        .title,
-                                                                artworkUrl:
-                                                                    item.episode
-                                                                        .podcast
-                                                                        .artworkUrl,
+                                                                id: item.episode.podcast.id,
+                                                                title: item.episode.podcast.title,
+                                                                artworkUrl: item.episode.podcast.artworkUrl,
                                                             },
                                                         }}
-                                                        progress={item.episode
-                                                            .progress}
+                                                        progress={item.episode.progress}
                                                         durationSeconds={item.episode.durationSeconds}
                                                         onMarkedAsPlayed={async () => {
-                                                            // Reload queue to refresh episode progress data
                                                             await loadQueue();
                                                         }}
                                                     />
@@ -265,60 +289,34 @@ export default function QueuePage() {
                                                 {item.episode.podcast.title}
                                             </p>
                                             <div className="mb-2 min-h-10">
-                                                {isCompleted &&
-                                                item.episode.durationSeconds ? (
+                                                {isCompleted && item.episode.durationSeconds ? (
                                                     <>
                                                         <div className="w-full bg-[#2a2a2a] rounded-full h-1.5 mb-1">
                                                             <div
                                                                 className="bg-[#FF3B30] h-1.5 rounded-full transition-all duration-300"
-                                                                style={{
-                                                                    width: '100%',
-                                                                }}
+                                                                style={{ width: '100%' }}
                                                             />
                                                         </div>
                                                         <div className="flex items-center justify-between text-xs text-[#a0a0a0]">
                                                             <span>
-                                                                {formatTime(
-                                                                    item.episode
-                                                                        .durationSeconds,
-                                                                )} /{" "}
-                                                                {formatTime(
-                                                                    item.episode
-                                                                        .durationSeconds,
-                                                                )}
+                                                                {formatTime(item.episode.durationSeconds)} / {formatTime(item.episode.durationSeconds)}
                                                             </span>
                                                             <span className="text-[#FF3B30]">Completed</span>
                                                         </div>
                                                     </>
-                                                ) : hasProgress &&
-                                                item.episode.durationSeconds ? (
+                                                ) : hasProgress && item.episode.durationSeconds ? (
                                                     <>
                                                         <div className="w-full bg-[#2a2a2a] rounded-full h-1.5 mb-1">
                                                             <div
                                                                 className="bg-[#FF3B30] h-1.5 rounded-full transition-all duration-300"
-                                                                style={{
-                                                                    width:
-                                                                        `${progressPercentage}%`,
-                                                                }}
+                                                                style={{ width: `${progressPercentage}%` }}
                                                             />
                                                         </div>
                                                         <div className="flex items-center justify-between text-xs text-[#a0a0a0]">
                                                             <span>
-                                                                {formatTime(
-                                                                    item.episode
-                                                                        .progress!
-                                                                        .positionSeconds,
-                                                                )} /{" "}
-                                                                {formatTime(
-                                                                    item.episode
-                                                                        .durationSeconds,
-                                                                )}
+                                                                {formatTime(item.episode.progress!.positionSeconds)} / {formatTime(item.episode.durationSeconds)}
                                                             </span>
-                                                            <span>
-                                                                {Math.round(
-                                                                    progressPercentage,
-                                                                )}% complete
-                                                            </span>
+                                                            <span>{Math.round(progressPercentage)}% complete</span>
                                                         </div>
                                                     </>
                                                 ) : (
@@ -329,10 +327,7 @@ export default function QueuePage() {
                                                         <div className="flex items-center justify-between text-xs text-[#a0a0a0]">
                                                             <span>
                                                                 {item.episode.durationSeconds
-                                                                    ? formatTime(
-                                                                        item.episode
-                                                                            .durationSeconds,
-                                                                    )
+                                                                    ? formatTime(item.episode.durationSeconds)
                                                                     : "Duration unknown"}
                                                             </span>
                                                             <span>Not started</span>
@@ -341,34 +336,73 @@ export default function QueuePage() {
                                                 )}
                                             </div>
                                         </div>
-                                        <div className="flex items-center space-x-2">
+                                        
+                                        {/* Mobile: progress bar */}
+                                        <div className="sm:hidden">
+                                            {isCompleted && item.episode.durationSeconds ? (
+                                                <>
+                                                    <div className="w-full bg-[#2a2a2a] rounded-full h-1.5 mb-1">
+                                                        <div
+                                                            className="bg-[#FF3B30] h-1.5 rounded-full transition-all duration-300"
+                                                            style={{ width: '100%' }}
+                                                        />
+                                                    </div>
+                                                    <div className="flex items-center justify-between text-xs text-[#a0a0a0]">
+                                                        <span>{formatTime(item.episode.durationSeconds)}</span>
+                                                        <span className="text-[#FF3B30]">Completed</span>
+                                                    </div>
+                                                </>
+                                            ) : hasProgress && item.episode.durationSeconds ? (
+                                                <>
+                                                    <div className="w-full bg-[#2a2a2a] rounded-full h-1.5 mb-1">
+                                                        <div
+                                                            className="bg-[#FF3B30] h-1.5 rounded-full transition-all duration-300"
+                                                            style={{ width: `${progressPercentage}%` }}
+                                                        />
+                                                    </div>
+                                                    <div className="flex items-center justify-between text-xs text-[#a0a0a0]">
+                                                        <span>{formatTime(item.episode.progress!.positionSeconds)} / {formatTime(item.episode.durationSeconds)}</span>
+                                                        <span>{Math.round(progressPercentage)}%</span>
+                                                    </div>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <div className="w-full bg-[#2a2a2a] rounded-full h-1.5 mb-1">
+                                                        <div className="h-1.5 rounded-full" />
+                                                    </div>
+                                                    <div className="flex items-center justify-between text-xs text-[#a0a0a0]">
+                                                        <span>
+                                                            {item.episode.durationSeconds
+                                                                ? formatTime(item.episode.durationSeconds)
+                                                                : "Unknown"}
+                                                        </span>
+                                                        <span>Not started</span>
+                                                    </div>
+                                                </>
+                                            )}
+                                        </div>
+                                        
+                                        {/* Action buttons - flex row on mobile, icon buttons */}
+                                        <div className="flex items-center justify-end gap-2 sm:gap-2">
                                             <Tooltip
                                                 content={isCurrentlyPlaying
                                                     ? "Currently Playing"
-                                                    : (hasProgress
-                                                        ? "Continue playing"
-                                                        : "Play")}
+                                                    : (hasProgress ? "Continue playing" : "Play")}
                                                 position="top"
                                             >
                                                 <Button
                                                     variant="icon"
-                                                    onClick={() =>
-                                                        handlePlay(item)}
+                                                    onClick={() => handlePlay(item)}
                                                     disabled={isCurrentlyPlaying}
                                                 >
                                                     <PlayIcon className="h-5 w-5" />
                                                 </Button>
                                             </Tooltip>
-                                            <Tooltip
-                                                content="Remove"
-                                                position="top"
-                                            >
+                                            <Tooltip content="Remove" position="top">
                                                 <Button
                                                     variant="icon"
-                                                    onClick={() =>
-                                                        handleRemove(item.id)}
-                                                    disabled={removing ===
-                                                        item.id}
+                                                    onClick={() => handleRemove(item.id)}
+                                                    disabled={removing === item.id}
                                                 >
                                                     <TrashIcon className="h-5 w-5" />
                                                 </Button>

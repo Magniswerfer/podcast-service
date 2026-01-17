@@ -1,5 +1,5 @@
 import { db } from './db';
-import { differenceInDays, startOfYear, endOfYear, parseISO } from 'date-fns';
+import { differenceInDays, startOfYear, endOfYear, parseISO, startOfDay } from 'date-fns';
 
 export interface DashboardStats {
   totalListeningTimeSeconds: number;
@@ -79,7 +79,9 @@ export async function calculateDashboardStats(userId: string): Promise<Dashboard
     if (h.completed && h.durationSeconds) {
       return sum + h.durationSeconds;
     }
-    return sum + h.positionSeconds;
+    // Only count positionSeconds if it's greater than 0 (meaningful listening progress)
+    const position = h.positionSeconds || 0;
+    return sum + position;
   }, 0);
 
   const totalEpisodesCompleted = history.filter((h) => h.completed).length;
@@ -95,9 +97,14 @@ export async function calculateDashboardStats(userId: string): Promise<Dashboard
     if (h.completed && h.durationSeconds) {
       return sum + h.durationSeconds;
     }
-    return sum + h.positionSeconds;
+    // Only count positionSeconds if it's greater than 0 (meaningful listening progress)
+    const position = h.positionSeconds || 0;
+    return sum + position;
   }, 0);
-  const averageDailyListeningTimeSeconds = recentListeningTime / 30;
+  // Only calculate average if there's recent activity, otherwise return 0
+  const averageDailyListeningTimeSeconds = recentHistory.length > 0 
+    ? recentListeningTime / 30 
+    : 0;
 
   // Top podcasts by listening time
   const podcastStats = new Map<
@@ -117,7 +124,9 @@ export async function calculateDashboardStats(userId: string): Promise<Dashboard
     if (h.completed && h.durationSeconds) {
       existing.listeningTime += h.durationSeconds;
     } else {
-      existing.listeningTime += h.positionSeconds;
+      // Only count positionSeconds if it's greater than 0 (meaningful listening progress)
+      const position = h.positionSeconds || 0;
+      existing.listeningTime += position;
     }
 
     if (h.completed) {
@@ -221,16 +230,23 @@ export async function calculateWrappedStats(
     .slice(0, 10);
 
   // Listening streaks
-  const sortedDates = completedHistory
-    .map((h) => h.lastUpdatedAt)
+  // Get unique days (normalize to start of day)
+  const uniqueDays = Array.from(
+    new Set(
+      completedHistory.map((h) =>
+        startOfDay(h.lastUpdatedAt).getTime()
+      )
+    )
+  )
+    .map((timestamp) => new Date(timestamp))
     .sort((a, b) => a.getTime() - b.getTime());
 
-  let currentStreak = 0;
+  // Calculate longest streak
   let longestStreak = 0;
   let tempStreak = 1;
 
-  for (let i = 1; i < sortedDates.length; i++) {
-    const daysDiff = differenceInDays(sortedDates[i], sortedDates[i - 1]);
+  for (let i = 1; i < uniqueDays.length; i++) {
+    const daysDiff = differenceInDays(uniqueDays[i], uniqueDays[i - 1]);
     if (daysDiff <= 1) {
       tempStreak++;
     } else {
@@ -240,23 +256,41 @@ export async function calculateWrappedStats(
   }
   longestStreak = Math.max(longestStreak, tempStreak);
 
-  // Current streak (from most recent)
-  const today = new Date();
-  let streakDate = today;
-  currentStreak = 0;
-  for (let i = sortedDates.length - 1; i >= 0; i--) {
-    const daysDiff = differenceInDays(today, sortedDates[i]);
-    if (daysDiff === currentStreak) {
-      currentStreak++;
-      streakDate = sortedDates[i];
-    } else {
-      break;
+  // Current streak (from today backwards)
+  const today = startOfDay(new Date());
+  let currentStreak = 0;
+  
+  if (uniqueDays.length > 0) {
+    const mostRecentDay = startOfDay(uniqueDays[uniqueDays.length - 1]);
+    const daysSinceMostRecent = differenceInDays(today, mostRecentDay);
+    
+    // Current streak only counts if there's been activity today or yesterday
+    // (streak is broken if last activity was more than 1 day ago)
+    if (daysSinceMostRecent <= 1) {
+      currentStreak = 1;
+      
+      // Count backwards from most recent day, checking for consecutive days
+      for (let i = uniqueDays.length - 2; i >= 0; i--) {
+        const currentDay = startOfDay(uniqueDays[i]);
+        const nextDay = startOfDay(uniqueDays[i + 1]);
+        const daysDiff = differenceInDays(nextDay, currentDay);
+        
+        // If days are consecutive (difference of 1 day), continue the streak
+        if (daysDiff === 1) {
+          currentStreak++;
+        } else {
+          // Gap found, streak ends here
+          break;
+        }
+      }
     }
   }
 
   // Average daily listening time
   const daysInYear = differenceInDays(yearEnd, yearStart) + 1;
-  const averageDailyListeningTimeSeconds = totalListeningTimeSeconds / daysInYear;
+  const averageDailyListeningTimeSeconds = daysInYear > 0 
+    ? totalListeningTimeSeconds / daysInYear 
+    : 0;
 
   // Peak listening hours
   const hourCounts = new Map<number, number>();

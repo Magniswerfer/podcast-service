@@ -46,6 +46,7 @@ export async function POST(request: NextRequest) {
               guid: episodeData.guid,
               title: episodeData.title,
               description: episodeData.description,
+              descriptionPlain: episodeData.descriptionPlain,
               audioUrl: episodeData.audioUrl,
               durationSeconds: episodeData.durationSeconds,
               publishedAt: episodeData.publishedAt,

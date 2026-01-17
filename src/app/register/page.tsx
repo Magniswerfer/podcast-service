@@ -1,113 +1,136 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { Card } from "@/components/ui/Card";
+import { Button } from "@/components/ui/Button";
 
 export default function RegisterPage() {
-  const router = useRouter();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+    const router = useRouter();
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setLoading(true);
+        setError("");
 
-    try {
-      const response = await fetch('/api/auth/web/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password: password || undefined }),
-      });
+        try {
+            const response = await fetch("/api/auth/web/register", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    email,
+                    password: password || undefined,
+                }),
+            });
 
-      const data = await response.json();
+            const data = await response.json();
 
-      if (!response.ok) {
-        throw new Error(data.error || 'Registration failed');
-      }
+            if (!response.ok) {
+                throw new Error(data.error || "Registration failed");
+            }
 
-      // Redirect to dashboard
-      router.push('/');
-      router.refresh();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Registration failed');
-      setLoading(false);
-    }
-  };
+            // Redirect to dashboard
+            router.push("/");
+            router.refresh();
+        } catch (err) {
+            setError(
+                err instanceof Error ? err.message : "Registration failed",
+            );
+            setLoading(false);
+        }
+    };
 
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-white">
-            Create your account
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
-            Or{' '}
-            <Link href="/login" className="font-medium text-blue-600 hover:text-blue-500">
-              sign in to your existing account
-            </Link>
-          </p>
+    return (
+        <div className="min-h-screen flex items-center justify-center bg-[#1a1a1a] py-12 px-4 sm:px-6 lg:px-8">
+            <div className="max-w-md w-full space-y-8">
+                <div>
+                    <h2 className="mt-6 text-center text-3xl font-extrabold text-white">
+                        Create your account
+                    </h2>
+                    <p className="mt-2 text-center text-sm text-[#a0a0a0]">
+                        Or{" "}
+                        <Link
+                            href="/login"
+                            className="font-medium text-[#FF3B30] hover:text-[#FF5247] transition-colors"
+                        >
+                            sign in to your existing account
+                        </Link>
+                    </p>
+                </div>
+                <Card className="p-8">
+                    <form className="space-y-6" onSubmit={handleSubmit}>
+                        {error && (
+                            <div className="bg-red-900/20 border border-red-800 rounded-[12px] p-4">
+                                <p className="text-sm text-red-400">{error}</p>
+                            </div>
+                        )}
+                        <div className="space-y-4">
+                            <div>
+                                <label
+                                    htmlFor="email"
+                                    className="block text-sm font-medium text-[#e5e5e5] mb-2"
+                                >
+                                    Email address
+                                </label>
+                                <input
+                                    id="email"
+                                    name="email"
+                                    type="email"
+                                    autoComplete="email"
+                                    required
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    className="w-full px-4 py-2 border border-[#2a2a2a] rounded-[12px] bg-[#1a1a1a] text-white placeholder-[#a0a0a0] focus:outline-none focus:border-[#FF3B30] focus:ring-2 focus:ring-[#FF3B30]/20 transition-all duration-200"
+                                    placeholder="Email address"
+                                />
+                            </div>
+                            <div>
+                                <label
+                                    htmlFor="password"
+                                    className="block text-sm font-medium text-[#e5e5e5] mb-2"
+                                >
+                                    Password
+                                </label>
+                                <input
+                                    id="password"
+                                    name="password"
+                                    type="password"
+                                    autoComplete="new-password"
+                                    value={password}
+                                    onChange={(e) =>
+                                        setPassword(e.target.value)}
+                                    className="w-full px-4 py-2 border border-[#2a2a2a] rounded-[12px] bg-[#1a1a1a] text-white placeholder-[#a0a0a0] focus:outline-none focus:border-[#FF3B30] focus:ring-2 focus:ring-[#FF3B30]/20 transition-all duration-200"
+                                    placeholder="Password (optional)"
+                                />
+                                <p className="mt-1 text-xs text-[#a0a0a0]">
+                                    Password is optional. If not provided, you
+                                    can only log in via API key.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div>
+                            <Button
+                                type="submit"
+                                disabled={loading}
+                                variant="primary"
+                                className="w-full"
+                            >
+                                {loading
+                                    ? "Creating account..."
+                                    : "Create account"}
+                            </Button>
+                        </div>
+                    </form>
+                </Card>
+            </div>
         </div>
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          {error && (
-            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
-              <p className="text-sm text-red-800 dark:text-red-200">{error}</p>
-            </div>
-          )}
-          <div className="rounded-md shadow-sm -space-y-px">
-            <div>
-              <label htmlFor="email" className="sr-only">
-                Email address
-              </label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                autoComplete="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-700 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white bg-white dark:bg-gray-800 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                placeholder="Email address"
-              />
-            </div>
-            <div>
-              <label htmlFor="password" className="sr-only">
-                Password
-              </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                autoComplete="new-password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-700 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white bg-white dark:bg-gray-800 rounded-b-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                placeholder="Password (optional)"
-              />
-              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                Password is optional. If not provided, you can only log in via API key.
-              </p>
-            </div>
-          </div>
-
-          <div>
-            <button
-              type="submit"
-              disabled={loading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
-            >
-              {loading ? 'Creating account...' : 'Create account'}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  );
+    );
 }

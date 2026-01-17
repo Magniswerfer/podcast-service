@@ -11,16 +11,18 @@ datasource db {
 }
 
 model User {
-  id           String   @id @default(uuid())
-  email        String   @unique
-  passwordHash String?  @map("password_hash")
-  apiKey       String   @unique @map("api_key") @db.VarChar(64)
-  createdAt    DateTime @default(now()) @map("created_at")
+  id              String   @id @default(uuid())
+  email           String   @unique
+  passwordHash    String?  @map("password_hash")
+  apiKey          String   @unique @map("api_key") @db.VarChar(64)
+  defaultSettings Json?    @map("default_settings")
+  createdAt       DateTime @default(now()) @map("created_at")
 
   subscriptions     Subscription[]
   listeningHistory  ListeningHistory[]
   queue             Queue[]
   favorites         Favorite[]
+  playlists         Playlist[]
 
   @@index([apiKey])
   @@map("users")
@@ -41,6 +43,7 @@ model Podcast {
   episodes      Episode[]
   subscriptions Subscription[]
   favorites     Favorite[]
+  playlistItems PlaylistItem[]
 
   @@index([feedUrl])
   @@map("podcasts")
@@ -52,6 +55,7 @@ model Episode {
   guid           String
   title          String
   description    String?   @db.Text
+  descriptionPlain String? @map("description_plain") @db.Text
   audioUrl       String    @map("audio_url") @db.VarChar(2048)
   durationSeconds Int?     @map("duration_seconds")
   publishedAt    DateTime  @map("published_at")
@@ -64,6 +68,7 @@ model Episode {
   listeningHistory ListeningHistory[]
   queue            Queue[]
   favorites        Favorite[]
+  playlistItems    PlaylistItem[]
 
   @@unique([podcastId, guid])
   @@index([podcastId])
@@ -130,4 +135,36 @@ model Favorite {
   podcast Podcast? @relation(fields: [podcastId], references: [id], onDelete: Cascade)
 
   @@map("favorites")
+}
+
+model Playlist {
+  id          String        @id @default(uuid())
+  userId      String        @map("user_id")
+  name        String
+  description String?       @db.Text
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime      @default(now()) @updatedAt @map("updated_at")
+
+  user  User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items PlaylistItem[]
+
+  @@index([userId])
+  @@index([userId, updatedAt])
+  @@map("playlists")
+}
+
+model PlaylistItem {
+  id         String    @id @default(uuid())
+  playlistId String   @map("playlist_id")
+  podcastId  String?   @map("podcast_id")
+  episodeId  String?   @map("episode_id")
+  position   Int
+  addedAt    DateTime  @default(now()) @map("added_at")
+
+  playlist Playlist @relation(fields: [playlistId], references: [id], onDelete: Cascade)
+  podcast  Podcast? @relation(fields: [podcastId], references: [id], onDelete: Cascade)
+  episode  Episode? @relation(fields: [episodeId], references: [id], onDelete: Cascade)
+
+  @@index([playlistId, position])
+  @@map("playlist_items")
 }

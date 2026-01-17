@@ -29,7 +29,42 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    return NextResponse.json({ queue });
+    // Get progress for all episodes in queue
+    const episodeIds = queue.map(item => item.episodeId);
+    const progressRecords = await db.listeningHistory.findMany({
+      where: {
+        userId: user.id,
+        episodeId: {
+          in: episodeIds,
+        },
+      },
+      select: {
+        episodeId: true,
+        positionSeconds: true,
+        durationSeconds: true,
+        completed: true,
+      },
+    });
+
+    // Create a map of episodeId -> progress
+    const progressMap = new Map(
+      progressRecords.map(p => [p.episodeId, {
+        positionSeconds: p.positionSeconds,
+        durationSeconds: p.durationSeconds,
+        completed: p.completed,
+      }])
+    );
+
+    // Attach progress to queue items
+    const queueWithProgress = queue.map(item => ({
+      ...item,
+      episode: {
+        ...item.episode,
+        progress: progressMap.get(item.episodeId) || null,
+      },
+    }));
+
+    return NextResponse.json({ queue: queueWithProgress });
   } catch (error) {
     console.error('Error fetching queue:', error);
     return NextResponse.json(
@@ -145,7 +180,42 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    return NextResponse.json({ queueItem, queue: updatedQueue }, { status: 201 });
+    // Get progress for all episodes in queue
+    const episodeIds = updatedQueue.map(item => item.episodeId);
+    const progressRecords = await db.listeningHistory.findMany({
+      where: {
+        userId: user.id,
+        episodeId: {
+          in: episodeIds,
+        },
+      },
+      select: {
+        episodeId: true,
+        positionSeconds: true,
+        durationSeconds: true,
+        completed: true,
+      },
+    });
+
+    // Create a map of episodeId -> progress
+    const progressMap = new Map(
+      progressRecords.map(p => [p.episodeId, {
+        positionSeconds: p.positionSeconds,
+        durationSeconds: p.durationSeconds,
+        completed: p.completed,
+      }])
+    );
+
+    // Attach progress to queue items
+    const queueWithProgress = updatedQueue.map(item => ({
+      ...item,
+      episode: {
+        ...item.episode,
+        progress: progressMap.get(item.episodeId) || null,
+      },
+    }));
+
+    return NextResponse.json({ queueItem, queue: queueWithProgress }, { status: 201 });
   } catch (error) {
     if (error instanceof Error && error.name === 'ZodError') {
       return NextResponse.json(
@@ -219,7 +289,42 @@ export async function PUT(request: NextRequest) {
       },
     });
 
-    return NextResponse.json({ queue: updatedQueue });
+    // Get progress for all episodes in queue
+    const episodeIds = updatedQueue.map(item => item.episodeId);
+    const progressRecords = await db.listeningHistory.findMany({
+      where: {
+        userId: user.id,
+        episodeId: {
+          in: episodeIds,
+        },
+      },
+      select: {
+        episodeId: true,
+        positionSeconds: true,
+        durationSeconds: true,
+        completed: true,
+      },
+    });
+
+    // Create a map of episodeId -> progress
+    const progressMap = new Map(
+      progressRecords.map(p => [p.episodeId, {
+        positionSeconds: p.positionSeconds,
+        durationSeconds: p.durationSeconds,
+        completed: p.completed,
+      }])
+    );
+
+    // Attach progress to queue items
+    const queueWithProgress = updatedQueue.map(item => ({
+      ...item,
+      episode: {
+        ...item.episode,
+        progress: progressMap.get(item.episodeId) || null,
+      },
+    }));
+
+    return NextResponse.json({ queue: queueWithProgress });
   } catch (error) {
     if (error instanceof Error && error.name === 'ZodError') {
       return NextResponse.json(
@@ -229,6 +334,92 @@ export async function PUT(request: NextRequest) {
     }
 
     console.error('Error reordering queue:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(request: NextRequest) {
+  const authResult = await authenticateRequestUnified(request);
+  if (authResult instanceof NextResponse) return authResult;
+  const { user } = authResult;
+
+  try {
+    // Get optional currentEpisodeId from query params to preserve currently playing item
+    const { searchParams } = new URL(request.url);
+    const currentEpisodeId = searchParams.get('currentEpisodeId');
+
+    // Delete all queue items for the user, excluding the currently playing episode if specified
+    const whereClause: any = { userId: user.id };
+    if (currentEpisodeId) {
+      whereClause.episodeId = { not: currentEpisodeId };
+    }
+
+    await db.queue.deleteMany({
+      where: whereClause,
+    });
+
+    // Return updated queue (which should only contain the current episode if it was preserved)
+    const updatedQueue = await db.queue.findMany({
+      where: { userId: user.id },
+      include: {
+        episode: {
+          include: {
+            podcast: {
+              select: {
+                id: true,
+                title: true,
+                artworkUrl: true,
+              },
+            },
+          },
+        },
+      },
+      orderBy: {
+        position: 'asc',
+      },
+    });
+
+    // Get progress for all episodes in queue
+    const episodeIds = updatedQueue.map(item => item.episodeId);
+    const progressRecords = episodeIds.length > 0 ? await db.listeningHistory.findMany({
+      where: {
+        userId: user.id,
+        episodeId: {
+          in: episodeIds,
+        },
+      },
+      select: {
+        episodeId: true,
+        positionSeconds: true,
+        durationSeconds: true,
+        completed: true,
+      },
+    }) : [];
+
+    // Create a map of episodeId -> progress
+    const progressMap = new Map(
+      progressRecords.map(p => [p.episodeId, {
+        positionSeconds: p.positionSeconds,
+        durationSeconds: p.durationSeconds,
+        completed: p.completed,
+      }])
+    );
+
+    // Attach progress to queue items
+    const queueWithProgress = updatedQueue.map(item => ({
+      ...item,
+      episode: {
+        ...item.episode,
+        progress: progressMap.get(item.episodeId) || null,
+      },
+    }));
+
+    return NextResponse.json({ success: true, queue: queueWithProgress });
+  } catch (error) {
+    console.error('Error clearing queue:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

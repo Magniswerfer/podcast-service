@@ -37,6 +37,28 @@ export const episodesQuerySchema = z.object({
   offset: z.coerce.number().int().min(0).optional().default(0),
   fromDate: z.string().datetime().optional(),
   toDate: z.string().datetime().optional(),
+  filter: z.enum(['all', 'unplayed', 'uncompleted', 'in-progress']).optional().default('all'),
+  sort: z.enum(['newest', 'oldest']).optional().default('newest'),
+});
+
+// Subscription settings schema
+export const subscriptionSettingsSchema = z.object({
+  episodeFilter: z.enum(['all', 'unplayed', 'uncompleted', 'in-progress']).optional(),
+  episodeSort: z.enum(['newest', 'oldest']).optional(),
+});
+
+// Profile schemas
+export const updateProfileSchema = z.object({
+  defaultSettings: z.object({
+    episodeFilter: z.enum(['all', 'unplayed', 'uncompleted', 'in-progress']).optional(),
+    episodeSort: z.enum(['newest', 'oldest']).optional(),
+    dateFormat: z.enum(['MM/DD/YYYY', 'DD/MM/YYYY', 'YYYY-MM-DD']).optional(),
+  }).optional(),
+});
+
+export const changePasswordSchema = z.object({
+  currentPassword: z.string().optional(),
+  newPassword: z.string().min(8),
 });
 
 // Progress schemas
@@ -65,6 +87,32 @@ export const reorderQueueSchema = z.object({
   ).min(1),
 });
 
+// Playlist schemas
+export const createPlaylistSchema = z.object({
+  name: z.string().min(1).max(200),
+  description: z.string().max(1000).optional(),
+});
+
+export const updatePlaylistSchema = z.object({
+  name: z.string().min(1).max(200).optional(),
+  description: z.string().max(1000).optional(),
+});
+
+export const addPlaylistItemSchema = z.object({
+  podcastId: z.string().uuid().optional(),
+  episodeId: z.string().uuid().optional(),
+  position: z.number().int().min(0).optional(),
+}).refine(
+  (data) => data.podcastId || data.episodeId,
+  {
+    message: "Either podcastId or episodeId must be provided",
+  }
+);
+
+export const updatePlaylistItemPositionSchema = z.object({
+  position: z.number().int().min(0),
+});
+
 // Type exports
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
@@ -75,3 +123,10 @@ export type ProgressUpdate = z.infer<typeof progressUpdateSchema>;
 export type BulkProgressUpdate = z.infer<typeof bulkProgressUpdateSchema>;
 export type AddToQueueInput = z.infer<typeof addToQueueSchema>;
 export type ReorderQueueInput = z.infer<typeof reorderQueueSchema>;
+export type CreatePlaylistInput = z.infer<typeof createPlaylistSchema>;
+export type UpdatePlaylistInput = z.infer<typeof updatePlaylistSchema>;
+export type AddPlaylistItemInput = z.infer<typeof addPlaylistItemSchema>;
+export type UpdatePlaylistItemPositionInput = z.infer<typeof updatePlaylistItemPositionSchema>;
+export type SubscriptionSettingsInput = z.infer<typeof subscriptionSettingsSchema>;
+export type UpdateProfileInput = z.infer<typeof updateProfileSchema>;
+export type ChangePasswordInput = z.infer<typeof changePasswordSchema>;

@@ -31,9 +31,9 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <PlayerProvider>
-          <div className="flex flex-col min-h-screen">
+          <div className="flex flex-col min-h-screen bg-[#1a1a1a]">
             <Navigation />
-            <main className="flex-1 pb-24">{children}</main>
+            <main className="flex-1 lg:ml-20 pb-16 lg:pb-24">{children}</main>
             <Player />
           </div>
         </PlayerProvider>

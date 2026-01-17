@@ -130,12 +130,47 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    const newQueueItem = updatedQueue.find((item) => item.episodeId === validated.episodeId);
+    // Get progress for all episodes in queue
+    const episodeIds = updatedQueue.map(item => item.episodeId);
+    const progressRecords = await db.listeningHistory.findMany({
+      where: {
+        userId: user.id,
+        episodeId: {
+          in: episodeIds,
+        },
+      },
+      select: {
+        episodeId: true,
+        positionSeconds: true,
+        durationSeconds: true,
+        completed: true,
+      },
+    });
+
+    // Create a map of episodeId -> progress
+    const progressMap = new Map(
+      progressRecords.map(p => [p.episodeId, {
+        positionSeconds: p.positionSeconds,
+        durationSeconds: p.durationSeconds,
+        completed: p.completed,
+      }])
+    );
+
+    // Attach progress to queue items
+    const queueWithProgress = updatedQueue.map(item => ({
+      ...item,
+      episode: {
+        ...item.episode,
+        progress: progressMap.get(item.episodeId) || null,
+      },
+    }));
+
+    const newQueueItem = queueWithProgress.find((item) => item.episodeId === validated.episodeId);
 
     return NextResponse.json(
       {
         queueItem: newQueueItem,
-        queue: updatedQueue,
+        queue: queueWithProgress,
       },
       { status: 201 }
     );

@@ -74,3 +74,8 @@ export interface Favorite {
   podcastId?: string;
   createdAt: Date;
 }
+
+export interface PodcastFilterSettings {
+  episodeFilter?: 'all' | 'unplayed' | 'uncompleted' | 'in-progress';
+  episodeSort?: 'newest' | 'oldest';
+}

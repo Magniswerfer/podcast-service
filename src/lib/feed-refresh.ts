@@ -55,6 +55,7 @@ export async function refreshPodcastFeed(podcastId: string): Promise<{
             guid: episodeData.guid,
             title: episodeData.title,
             description: episodeData.description,
+            descriptionPlain: episodeData.descriptionPlain,
             audioUrl: episodeData.audioUrl,
             durationSeconds: episodeData.durationSeconds,
             publishedAt: episodeData.publishedAt,
@@ -65,6 +66,7 @@ export async function refreshPodcastFeed(podcastId: string): Promise<{
           update: {
             title: episodeData.title,
             description: episodeData.description,
+            descriptionPlain: episodeData.descriptionPlain,
             audioUrl: episodeData.audioUrl,
             durationSeconds: episodeData.durationSeconds,
             publishedAt: episodeData.publishedAt,

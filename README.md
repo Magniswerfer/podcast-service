@@ -1,15 +1,19 @@
 # Podcast Sync Service
 
-A full-stack podcast synchronization service built with Next.js 14+, PostgreSQL, Prisma, and TypeScript. Provides API endpoints for iOS app integration and a web-based player interface.
+A full-stack podcast synchronization service built with Next.js 14+, PostgreSQL,
+Prisma, and TypeScript. Provides API endpoints for iOS app integration and a
+web-based player interface.
 
 ## Features
 
-- **Podcast Management**: Subscribe to podcasts via RSS feed URL or iTunes search
+- **Podcast Management**: Subscribe to podcasts via RSS feed URL or iTunes
+  search
 - **Episode Sync**: Automatic RSS feed parsing and episode management
 - **Progress Tracking**: Sync listening progress across devices
 - **Queue Management**: Build and manage your listening queue
 - **Web Player**: Full-featured audio player with speed controls, skip, and more
-- **Statistics**: Track listening time, top podcasts, and generate year-end wrapped data
+- **Statistics**: Track listening time, top podcasts, and generate year-end
+  wrapped data
 - **Background Jobs**: Automatic feed refresh and cleanup tasks
 
 ## Tech Stack
@@ -31,38 +35,45 @@ A full-stack podcast synchronization service built with Next.js 14+, PostgreSQL,
 ### Installation
 
 1. Clone the repository:
+
 ```bash
 git clone <repository-url>
 cd podcast-service
 ```
 
 2. Install dependencies:
+
 ```bash
 npm install
 ```
 
 3. Set up environment variables:
+
 ```bash
 cp .env.example .env
 # Edit .env with your configuration
 ```
 
 4. Start PostgreSQL database:
+
 ```bash
 docker-compose up -d
 ```
 
 5. Run database migrations:
+
 ```bash
 npx prisma migrate dev
 ```
 
 6. Generate Prisma client:
+
 ```bash
 npx prisma generate
 ```
 
 7. Start the development server:
+
 ```bash
 npm run dev
 ```
@@ -141,24 +152,26 @@ Configure cron jobs to automatically refresh feeds and perform cleanup:
 ### Vercel Cron (if deploying to Vercel)
 
 Add to `vercel.json`:
+
 ```json
 {
-  "crons": [
-    {
-      "path": "/api/cron/refresh-feeds",
-      "schedule": "0 */6 * * *"
-    },
-    {
-      "path": "/api/cron/cleanup",
-      "schedule": "0 2 * * *"
-    }
-  ]
+    "crons": [
+        {
+            "path": "/api/cron/refresh-feeds",
+            "schedule": "0 */6 * * *"
+        },
+        {
+            "path": "/api/cron/cleanup",
+            "schedule": "0 2 * * *"
+        }
+    ]
 }
 ```
 
 ### External Cron Service
 
 Set `CRON_SECRET` environment variable and call endpoints with:
+
 ```
 Authorization: Bearer <CRON_SECRET>
 ```

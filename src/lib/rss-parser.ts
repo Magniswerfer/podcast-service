@@ -1,4 +1,5 @@
 import Parser from 'rss-parser';
+import DOMPurify from 'isomorphic-dompurify';
 
 const parser = new Parser({
   customFields: {
@@ -8,6 +9,8 @@ const parser = new Parser({
       ['itunes:season', 'itunesSeason'],
       ['itunes:image', 'itunesImage', { keepArray: false }],
       ['enclosure', 'enclosure', { keepArray: false }],
+      ['content:encoded', 'contentEncoded'],
+      ['itunes:summary', 'itunesSummary'],
     ],
     feed: [
       ['itunes:image', 'itunesImage', { keepArray: false }],
@@ -30,6 +33,7 @@ export interface ParsedEpisode {
   guid: string;
   title: string;
   description?: string;
+  descriptionPlain?: string;
   audioUrl: string;
   durationSeconds?: number;
   publishedAt: Date;
@@ -55,6 +59,15 @@ function parseDuration(duration: string | undefined): number | undefined {
   // Handle numeric string (seconds)
   const seconds = parseInt(duration, 10);
   return isNaN(seconds) ? undefined : seconds;
+}
+
+/**
+ * Strip HTML tags from text and return plain text
+ */
+function stripHtml(html: string | undefined): string | undefined {
+  if (!html) return undefined;
+  // Use DOMPurify to strip all HTML tags
+  return DOMPurify.sanitize(html, { ALLOWED_TAGS: [] }).trim();
 }
 
 /**
@@ -98,11 +111,17 @@ export async function parseFeed(feedUrl: string): Promise<ParsedFeed> {
       const guid = item.guid || item.id || item.link || '';
       const audioUrl = item.enclosure?.url || item.link || '';
       const publishedAt = item.pubDate ? new Date(item.pubDate) : new Date();
+      
+      // Get HTML description (prioritize contentEncoded, then content, then others)
+      const htmlDescription = item.contentEncoded || item.content || item.itunesSummary || item.summary || item.description;
+      // Extract plain text version
+      const plainDescription = stripHtml(htmlDescription);
 
       return {
         guid,
         title: item.title || 'Untitled Episode',
-        description: item.contentSnippet || item.content || item.summary,
+        description: htmlDescription,
+        descriptionPlain: plainDescription,
         audioUrl,
         durationSeconds: parseDuration(item.itunesDuration),
         publishedAt,

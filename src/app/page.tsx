@@ -2,6 +2,13 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { Card } from '@/components/ui/Card';
+import { PlayIcon } from '@heroicons/react/24/solid';
+import { Button } from '@/components/ui/Button';
+import { Tooltip } from '@/components/Tooltip';
+import { usePlayer } from '@/contexts/PlayerContext';
+import { AlertModal } from '@/components/AlertModal';
+import { formatDate, useDateFormat } from '@/lib/date-format';
 
 interface Episode {
   id: string;
@@ -28,6 +35,9 @@ export default function Dashboard() {
   const [newEpisodes, setNewEpisodes] = useState<Episode[]>([]);
   const [stats, setStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [alertMessage, setAlertMessage] = useState<string | null>(null);
+  const { playEpisode } = usePlayer();
+  const userDateFormat = useDateFormat();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -88,80 +98,118 @@ export default function Dashboard() {
     return `${minutes}m`;
   };
 
+  const handlePlayEpisode = async (e: React.MouseEvent, episodeId: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    try {
+      const res = await fetch(`/api/episodes/${episodeId}`);
+      if (!res.ok) {
+        throw new Error('Failed to fetch episode');
+      }
+      const data = await res.json();
+      await playEpisode({
+        id: data.id,
+        title: data.title,
+        audioUrl: data.audioUrl,
+        artworkUrl: data.artworkUrl,
+        podcast: {
+          id: data.podcast.id,
+          title: data.podcast.title,
+          artworkUrl: data.podcast.artworkUrl,
+        },
+      });
+    } catch (error) {
+      console.error('Error fetching episode:', error);
+      setAlertMessage('Failed to load episode. Please try again.');
+    }
+  };
+
   if (loading) {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="text-center">Loading...</div>
+        <div className="text-center text-[#a0a0a0]">Loading...</div>
       </div>
     );
   }
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">
+      <h1 className="text-3xl font-bold text-white mb-8">
         Dashboard
       </h1>
 
       {/* Stats Overview */}
       {stats && (
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-            <p className="text-sm text-gray-500 dark:text-gray-400">Total Listening Time</p>
-            <p className="text-2xl font-bold text-gray-900 dark:text-white">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <Card hover={false} className="p-6">
+            <p className="text-sm text-[#a0a0a0] mb-2">Total Listening Time</p>
+            <p className="text-2xl font-bold text-white">
               {formatTime(stats.totalListeningTimeSeconds || 0)}
             </p>
-          </div>
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-            <p className="text-sm text-gray-500 dark:text-gray-400">Episodes Completed</p>
-            <p className="text-2xl font-bold text-gray-900 dark:text-white">
+          </Card>
+          <Card hover={false} className="p-6">
+            <p className="text-sm text-[#a0a0a0] mb-2">Episodes Completed</p>
+            <p className="text-2xl font-bold text-white">
               {stats.totalEpisodesCompleted || 0}
             </p>
-          </div>
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-            <p className="text-sm text-gray-500 dark:text-gray-400">In Progress</p>
-            <p className="text-2xl font-bold text-gray-900 dark:text-white">
+          </Card>
+          <Card hover={false} className="p-6">
+            <p className="text-sm text-[#a0a0a0] mb-2">In Progress</p>
+            <p className="text-2xl font-bold text-white">
               {stats.totalEpisodesInProgress || 0}
             </p>
-          </div>
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-            <p className="text-sm text-gray-500 dark:text-gray-400">Subscribed</p>
-            <p className="text-2xl font-bold text-gray-900 dark:text-white">
+          </Card>
+          <Card hover={false} className="p-6">
+            <p className="text-sm text-[#a0a0a0] mb-2">Subscribed</p>
+            <p className="text-2xl font-bold text-white">
               {stats.totalPodcastsSubscribed || 0}
             </p>
-          </div>
+          </Card>
         </div>
       )}
 
       {/* Recently Played */}
       <div className="mb-8">
-        <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">
+        <h2 className="text-2xl font-semibold text-white mb-6">
           Recently Played
         </h2>
         {recentEpisodes.length === 0 ? (
-          <p className="text-gray-500 dark:text-gray-400">No recent episodes</p>
+          <p className="text-[#a0a0a0]">No recent episodes</p>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {recentEpisodes.map((episode) => (
               <Link
                 key={episode.id}
                 href={`/podcasts/${episode.podcast.id}`}
-                className="bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-lg transition p-4"
               >
-                <div className="flex space-x-4">
-                  <img
-                    src={episode.artworkUrl || episode.podcast.artworkUrl || '/placeholder-artwork.png'}
-                    alt={episode.title}
-                    className="h-20 w-20 rounded object-cover flex-shrink-0"
-                  />
-                  <div className="flex-1 min-w-0">
-                    <p className="font-medium text-gray-900 dark:text-white truncate">
-                      {episode.title}
-                    </p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
-                      {episode.podcast.title}
-                    </p>
+                <Card interactive className="p-4">
+                  <div className="flex space-x-4">
+                    <img
+                      src={episode.artworkUrl || episode.podcast.artworkUrl || '/placeholder-artwork.png'}
+                      alt={episode.title}
+                      className="h-20 w-20 rounded-[12px] object-cover flex-shrink-0"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-white truncate">
+                        {episode.title}
+                      </p>
+                      <p className="text-sm text-[#a0a0a0] truncate">
+                        {episode.podcast.title}
+                      </p>
+                    </div>
+                    <div className="flex items-center flex-shrink-0">
+                      <Tooltip content="Play" position="left">
+                        <Button
+                          variant="icon"
+                          size="sm"
+                          onClick={(e) => handlePlayEpisode(e, episode.id)}
+                        >
+                          <PlayIcon className="h-5 w-5" />
+                        </Button>
+                      </Tooltip>
+                    </div>
                   </div>
-                </div>
+                </Card>
               </Link>
             ))}
           </div>
@@ -170,42 +218,62 @@ export default function Dashboard() {
 
       {/* New Episodes */}
       <div>
-        <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">
+        <h2 className="text-2xl font-semibold text-white mb-6">
           New Episodes
         </h2>
         {newEpisodes.length === 0 ? (
-          <p className="text-gray-500 dark:text-gray-400">No new episodes</p>
+          <p className="text-[#a0a0a0]">No new episodes</p>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {newEpisodes.map((episode) => (
               <Link
                 key={episode.id}
                 href={`/podcasts/${episode.podcast.id}`}
-                className="bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-lg transition p-4"
               >
-                <div className="flex space-x-4">
-                  <img
-                    src={episode.artworkUrl || episode.podcast.artworkUrl || '/placeholder-artwork.png'}
-                    alt={episode.title}
-                    className="h-20 w-20 rounded object-cover flex-shrink-0"
-                  />
-                  <div className="flex-1 min-w-0">
-                    <p className="font-medium text-gray-900 dark:text-white truncate">
-                      {episode.title}
-                    </p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
-                      {episode.podcast.title}
-                    </p>
-                    <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
-                      {new Date(episode.publishedAt).toLocaleDateString()}
-                    </p>
+                <Card interactive className="p-4">
+                  <div className="flex space-x-4">
+                    <img
+                      src={episode.artworkUrl || episode.podcast.artworkUrl || '/placeholder-artwork.png'}
+                      alt={episode.title}
+                      className="h-20 w-20 rounded-[12px] object-cover flex-shrink-0"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-white truncate">
+                        {episode.title}
+                      </p>
+                      <p className="text-sm text-[#a0a0a0] truncate">
+                        {episode.podcast.title}
+                      </p>
+                      <p className="text-xs text-[#a0a0a0] mt-1">
+                        {formatDate(episode.publishedAt, userDateFormat)}
+                      </p>
+                    </div>
+                    <div className="flex items-center flex-shrink-0">
+                      <Tooltip content="Play" position="left">
+                        <Button
+                          variant="icon"
+                          size="sm"
+                          onClick={(e) => handlePlayEpisode(e, episode.id)}
+                        >
+                          <PlayIcon className="h-5 w-5" />
+                        </Button>
+                      </Tooltip>
+                    </div>
                   </div>
-                </div>
+                </Card>
               </Link>
             ))}
           </div>
         )}
       </div>
+
+      {alertMessage && (
+        <AlertModal
+          message={alertMessage}
+          onClose={() => setAlertMessage(null)}
+          title="Error"
+        />
+      )}
     </div>
   );
 }

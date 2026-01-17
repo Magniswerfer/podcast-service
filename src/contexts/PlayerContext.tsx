@@ -753,3 +753,8 @@ export function usePlayer() {
   }
   return context;
 }
+
+export function usePlayerVisible() {
+  const { currentEpisode } = usePlayer();
+  return currentEpisode !== null;
+}

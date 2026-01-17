@@ -9,26 +9,29 @@
   --text-primary: #ffffff;
   --text-secondary: #a0a0a0;
   --border: #2a2a2a;
-  
+
   /* Red accent */
   --accent: #FF3B30;
   --accent-hover: #FF5247;
   --accent-light: rgba(255, 59, 48, 0.1);
-  
+
   /* Shadows */
   --shadow-card: 0 4px 12px rgba(0, 0, 0, 0.3);
   --shadow-player: 0 -4px 24px rgba(0, 0, 0, 0.4);
   --shadow-button: 0 2px 8px rgba(255, 59, 48, 0.3);
-  
+
   /* Border radius */
   --radius-card: 20px;
   --radius-button: 12px;
   --radius-input: 12px;
-  
+
   /* Transitions */
   --transition-fast: 150ms ease-in-out;
   --transition-normal: 250ms ease-in-out;
   --transition-slow: 400ms ease-in-out;
+
+  /* iOS Safe Area Insets */
+  --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 @theme inline {

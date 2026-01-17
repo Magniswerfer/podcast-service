@@ -31,6 +31,7 @@
   --transition-slow: 400ms ease-in-out;
 
   /* iOS Safe Area Insets */
+  --safe-area-inset-top: env(safe-area-inset-top, 0px);
   --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
 }
 
@@ -52,6 +53,7 @@ body {
   color: var(--foreground);
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
   scroll-behavior: smooth;
+  padding-top: env(safe-area-inset-top, 0px);
 }
 
 /* Smooth scrollbar */

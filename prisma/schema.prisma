@@ -1,0 +1,133 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String?  @map("password_hash")
+  apiKey       String   @unique @map("api_key") @db.VarChar(64)
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  subscriptions     Subscription[]
+  listeningHistory  ListeningHistory[]
+  queue             Queue[]
+  favorites         Favorite[]
+
+  @@index([apiKey])
+  @@map("users")
+}
+
+model Podcast {
+  id            String      @id @default(uuid())
+  feedUrl       String      @unique @map("feed_url") @db.VarChar(2048)
+  title         String
+  description   String?     @db.Text
+  author        String?
+  artworkUrl    String?     @map("artwork_url") @db.VarChar(2048)
+  language      String?
+  categories    String[]
+  lastFetchedAt DateTime?   @map("last_fetched_at")
+  createdAt     DateTime    @default(now()) @map("created_at")
+
+  episodes      Episode[]
+  subscriptions Subscription[]
+  favorites     Favorite[]
+
+  @@index([feedUrl])
+  @@map("podcasts")
+}
+
+model Episode {
+  id             String    @id @default(uuid())
+  podcastId      String    @map("podcast_id")
+  guid           String
+  title          String
+  description    String?   @db.Text
+  audioUrl       String    @map("audio_url") @db.VarChar(2048)
+  durationSeconds Int?     @map("duration_seconds")
+  publishedAt    DateTime  @map("published_at")
+  artworkUrl     String?   @map("artwork_url") @db.VarChar(2048)
+  season         Int?
+  episodeNumber  Int?      @map("episode_number")
+  createdAt      DateTime  @default(now()) @map("created_at")
+
+  podcast          Podcast           @relation(fields: [podcastId], references: [id], onDelete: Cascade)
+  listeningHistory ListeningHistory[]
+  queue            Queue[]
+  favorites        Favorite[]
+
+  @@unique([podcastId, guid])
+  @@index([podcastId])
+  @@index([publishedAt])
+  @@map("episodes")
+}
+
+model Subscription {
+  id            String   @id @default(uuid())
+  userId        String   @map("user_id")
+  podcastId     String   @map("podcast_id")
+  subscribedAt  DateTime @default(now()) @map("subscribed_at")
+  customSettings Json?   @map("custom_settings")
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  podcast Podcast @relation(fields: [podcastId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, podcastId])
+  @@map("subscriptions")
+}
+
+model ListeningHistory {
+  id               String   @id @default(uuid())
+  userId           String   @map("user_id")
+  episodeId        String   @map("episode_id")
+  positionSeconds  Int      @default(0) @map("position_seconds")
+  durationSeconds  Int?     @map("duration_seconds")
+  completed        Boolean  @default(false)
+  lastUpdatedAt    DateTime @default(now()) @updatedAt @map("last_updated_at")
+  listeningSessions Json?  @map("listening_sessions")
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  episode Episode @relation(fields: [episodeId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, episodeId])
+  @@index([userId, lastUpdatedAt])
+  @@map("listening_history")
+}
+
+model Queue {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  episodeId String   @map("episode_id")
+  position  Int
+  addedAt   DateTime @default(now()) @map("added_at")
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  episode Episode @relation(fields: [episodeId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, episodeId])
+  @@index([userId, position])
+  @@map("queue")
+}
+
+model Favorite {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  episodeId String?  @map("episode_id")
+  podcastId String?  @map("podcast_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  episode Episode? @relation(fields: [episodeId], references: [id], onDelete: Cascade)
+  podcast Podcast? @relation(fields: [podcastId], references: [id], onDelete: Cascade)
+
+  @@map("favorites")
+}

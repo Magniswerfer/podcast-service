@@ -34,8 +34,8 @@ export function Player() {
 
     const [showQueue, setShowQueue] = useState(false);
 
-    // Only show player when episode is playing
-    if (!currentEpisode || !isPlaying) {
+    // Only show player when there is a current episode
+    if (!currentEpisode) {
         return null;
     }
 

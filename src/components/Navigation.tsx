@@ -213,7 +213,7 @@ export function Navigation() {
             <nav
                 className="lg:hidden fixed bottom-0 left-0 right-0 bg-[#1a1a1a] border-t border-[#2a2a2a] z-50"
                 style={{
-                    paddingBottom: 'var(--safe-area-inset-bottom)',
+                    paddingBottom: 'env(safe-area-inset-bottom, 0px)',
                 }}
             >
                 <div

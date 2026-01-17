@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Navigation } from "@/components/Navigation";
@@ -19,11 +19,18 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Podcast Sync",
   description: "Sync and play your favorite podcasts",
-  viewport: {
-    width: "device-width",
-    initialScale: 1,
-    viewportFit: "cover",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "Podcast Sync",
   },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
 };
 
 export default function RootLayout({

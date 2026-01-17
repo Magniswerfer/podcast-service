@@ -8,6 +8,7 @@ interface Episode {
   title: string;
   audioUrl: string;
   artworkUrl?: string;
+  durationSeconds?: number;
   podcast: {
     id: string;
     title: string;
@@ -15,11 +16,21 @@ interface Episode {
   };
 }
 
+interface EpisodeProgress {
+  positionSeconds: number;
+  durationSeconds?: number;
+  completed: boolean;
+}
+
+interface QueueEpisode extends Episode {
+  progress?: EpisodeProgress | null;
+}
+
 interface QueueItem {
   id: string;
   episodeId: string;
   position: number;
-  episode: Episode;
+  episode: QueueEpisode;
 }
 
 // localStorage persistence for player state

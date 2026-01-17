@@ -21,5 +21,5 @@ export async function authenticateWebRequest(
     );
   }
 
-  return { user: session };
+  return { user: { id: session.userId, email: session.email, apiKey: session.apiKey } };
 }

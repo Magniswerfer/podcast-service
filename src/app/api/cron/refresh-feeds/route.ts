@@ -1,21 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { refreshAllFeeds } from '@/lib/feed-refresh';
 
-/**
- * Cron job endpoint to refresh all podcast feeds
- * Should be called every 6 hours
- * 
- * For Vercel Cron: Add to vercel.json:
- * {
- *   "crons": [{
- *     "path": "/api/cron/refresh-feeds",
- *     "schedule": "0 */6 * * *"
- *   }]
- * }
- * 
- * For external cron services, protect with a secret header:
- * Authorization: Bearer <CRON_SECRET>
- */
+// Cron job endpoint to refresh all podcast feeds
+// Should be called every 6 hours
+// 
+// For Vercel Cron: Add to vercel.json with path "/api/cron/refresh-feeds"
+// and schedule every 6 hours
+// 
+// For external cron services, protect with a secret header:
+// Authorization: Bearer CRON_SECRET
 export async function POST(request: NextRequest) {
   // Optional: Add authentication for cron jobs
   const authHeader = request.headers.get('authorization');

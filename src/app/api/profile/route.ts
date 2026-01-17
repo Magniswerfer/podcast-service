@@ -76,22 +76,20 @@ export async function PATCH(request: NextRequest) {
 
     // Merge with existing settings
     const existingSettings = (currentUser?.defaultSettings as Record<string, unknown>) || {};
-    const updatedSettings = {
+    const mergedSettings: Record<string, unknown> = {
       ...existingSettings,
       ...validated.defaultSettings,
     };
 
     // Remove undefined values
-    Object.keys(updatedSettings).forEach(key => {
-      if (updatedSettings[key] === undefined) {
-        delete updatedSettings[key];
-      }
-    });
+    const updatedSettings = Object.fromEntries(
+      Object.entries(mergedSettings).filter(([, value]) => value !== undefined)
+    );
 
     const updatedUser = await db.user.update({
       where: { id: user.id },
       data: {
-        defaultSettings: updatedSettings,
+        defaultSettings: updatedSettings as object,
       },
       select: {
         id: true,

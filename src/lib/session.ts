@@ -9,6 +9,7 @@ export interface SessionData {
   userId: string;
   email: string;
   apiKey: string;
+  [key: string]: unknown;
 }
 
 /**

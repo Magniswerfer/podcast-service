@@ -41,18 +41,16 @@ export async function PATCH(
     const validated = subscriptionSettingsSchema.parse(body);
 
     // Merge with existing customSettings
-    const existingSettings = (subscription.customSettings as Record<string, any>) || {};
-    const updatedSettings = {
+    const existingSettings = (subscription.customSettings as Record<string, unknown>) || {};
+    const mergedSettings: Record<string, unknown> = {
       ...existingSettings,
       ...validated,
     };
 
     // Remove undefined values
-    Object.keys(updatedSettings).forEach(key => {
-      if (updatedSettings[key] === undefined) {
-        delete updatedSettings[key];
-      }
-    });
+    const updatedSettings = Object.fromEntries(
+      Object.entries(mergedSettings).filter(([, value]) => value !== undefined)
+    );
 
     // Update subscription
     const updated = await db.subscription.update({
@@ -60,7 +58,7 @@ export async function PATCH(
         id: subscription.id,
       },
       data: {
-        customSettings: updatedSettings,
+        customSettings: updatedSettings as object,
       },
       include: {
         podcast: {

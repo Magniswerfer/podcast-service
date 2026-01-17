@@ -16,11 +16,16 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Generate Prisma Client
+# Set build-time environment variables
+# DATABASE_URL is needed for Prisma Client generation (can be dummy for build)
+ENV DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy"
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV NODE_ENV=production
+
+# Generate Prisma Client (doesn't need real DB connection)
 RUN npx prisma generate
 
 # Build Next.js app
-ENV NEXT_TELEMETRY_DISABLED 1
 RUN npm run build
 
 # Production image, copy all the files and run next

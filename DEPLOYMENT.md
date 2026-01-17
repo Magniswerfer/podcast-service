@@ -133,30 +133,74 @@ You can customize the ports by setting environment variables in Portainer:
 
 ## Database Migrations
 
-Prisma migrations run automatically on container startup via the `command` in docker-compose.yml.
+Prisma migrations run automatically on container startup via the `command` in docker-compose.yml. This means:
+- When you update the app, migrations run automatically
+- Your existing data is preserved
+- Only schema changes are applied (new tables, columns, etc.)
+- No data loss occurs
 
 To run migrations manually:
 ```bash
 docker exec -it podcast-app npx prisma migrate deploy
 ```
 
+**Note:** Migrations are safe - they only add/modify schema, they don't delete your data unless explicitly designed to do so.
+
 ## Updating the Application
+
+### ⚠️ Important: Your Database is Safe!
+
+**Your database data will NOT be lost when updating!** The `postgres_data` volume persists all your data between updates. Only the application code gets updated.
 
 ### If deployed from GitHub:
 
-1. **Pull latest changes:**
-   - In Portainer: **Stacks** → Your stack → **Editor** → **Pull and redeploy**
-   - Or manually: **Stacks** → Your stack → **Editor** → Update → **Update the stack**
+**Method 1: Pull and Redeploy (Recommended)**
+1. Push your changes to GitHub
+2. In Portainer: **Stacks** → Your stack → **Editor**
+3. Click **Pull and redeploy** button
+   - This pulls the latest code from GitHub
+   - Rebuilds the app container with new code
+   - **Keeps your database volume intact**
+   - Preserves your environment variables
 
-2. **Rebuild:**
-   - Portainer will rebuild the image automatically
-   - Or trigger rebuild: **Stacks** → Your stack → **Editor** → **Rebuild**
+**Method 2: Manual Update**
+1. Push your changes to GitHub
+2. In Portainer: **Stacks** → Your stack → **Editor**
+3. Click **Update the stack**
+4. Portainer will:
+   - Pull latest code from GitHub
+   - Rebuild the app image
+   - Restart containers with new code
+   - **Database volume remains untouched**
 
 ### If deployed locally:
 
-1. Pull latest code
+1. Pull latest code to your local machine
 2. Rebuild the image: `docker build -t podcast-service:latest .`
 3. In Portainer: **Stacks** → Your stack → **Editor** → **Update the stack**
+
+### What Gets Updated vs Preserved:
+
+✅ **Updated (Replaced):**
+- Application code
+- Application container
+- Dependencies (npm packages)
+- Prisma migrations (run automatically)
+
+✅ **Preserved (Not Touched):**
+- Database data (stored in `postgres_data` volume)
+- Environment variables you set in Portainer
+- Custom port configurations
+- Database container (only restarted if needed)
+
+### Environment Variables During Updates:
+
+When you update, Portainer preserves environment variables you've set. However, if you add new environment variables to `docker-compose.yml`, you may need to:
+1. Update the stack
+2. Add the new variables in Portainer's **Environment** section
+3. Redeploy
+
+**Tip:** Store your custom environment variables (like `SESSION_SECRET`, `CRON_SECRET`, `APP_PORT`) in Portainer's **Environment** section rather than editing `docker-compose.yml` directly. This way they persist across updates.
 
 ## Troubleshooting
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { PlusIcon, PlayIcon } from "@heroicons/react/24/outline";
@@ -10,7 +10,7 @@ import { AddToPlaylistModal } from "@/components/AddToPlaylistModal";
 import { Button } from "@/components/ui/Button";
 import { formatDate, useDateFormat } from "@/lib/date-format";
 
-export default function PlayerPage() {
+function PlayerPageContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const { currentEpisode, loadEpisode, playEpisode, isPlaying, currentTime } = usePlayer();
@@ -335,5 +335,17 @@ export default function PlayerPage() {
                 </div>
             )}
         </div>
+    );
+}
+
+export default function PlayerPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen bg-[#1a1a1a] flex items-center justify-center pb-40">
+                <div className="text-[#a0a0a0]">Loading...</div>
+            </div>
+        }>
+            <PlayerPageContent />
+        </Suspense>
     );
 }

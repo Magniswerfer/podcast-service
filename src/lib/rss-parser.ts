@@ -1,6 +1,7 @@
 import Parser from 'rss-parser';
 import DOMPurify from 'isomorphic-dompurify';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const parser = new Parser({
   customFields: {
     item: [
@@ -16,7 +17,7 @@ const parser = new Parser({
       ['itunes:image', 'itunesImage', { keepArray: false }],
       ['itunes:category', 'itunesCategories', { keepArray: true }],
     ],
-  },
+  } as any,
 });
 
 export interface ParsedFeed {

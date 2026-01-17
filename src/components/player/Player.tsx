@@ -86,14 +86,19 @@ export function Player() {
                         </div>
 
                         {/* Play/Pause Button */}
-                        <button
-                            onClick={togglePlayPause}
-                            className="p-2 rounded-full bg-[#FF3B30] hover:bg-[#FF5247] text-white shadow-[0_2px_8px_rgba(255,59,48,0.3)] transition-all duration-200 active:scale-95"
+                        <Tooltip
+                            content={isPlaying ? "Pause" : "Play"}
+                            position="top"
                         >
-                            {isPlaying
-                                ? <PauseIcon className="h-5 w-5" />
-                                : <PlayIcon className="h-5 w-5" />}
-                        </button>
+                            <button
+                                onClick={togglePlayPause}
+                                className="p-2 rounded-full bg-[#FF3B30] hover:bg-[#FF5247] text-white shadow-[0_2px_8px_rgba(255,59,48,0.3)] transition-all duration-200 active:scale-95"
+                            >
+                                {isPlaying
+                                    ? <PauseIcon className="h-5 w-5" />
+                                    : <PlayIcon className="h-5 w-5" />}
+                            </button>
+                        </Tooltip>
 
                         {/* Maximize Button */}
                         <Tooltip content="Expand player" position="top">

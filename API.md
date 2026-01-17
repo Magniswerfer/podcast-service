@@ -5,6 +5,7 @@ Complete API reference for iOS app integration and other external clients.
 ## Table of Contents
 
 - [Authentication](#authentication)
+- [Profile](#profile)
 - [Podcasts](#podcasts)
 - [Episodes](#episodes)
 - [Progress](#progress)
@@ -85,6 +86,149 @@ Authenticate and receive your API key.
 **Error Responses:**
 - **400:** Invalid request data
 - **401:** Invalid email or password
+
+---
+
+## Profile
+
+### GET /api/profile
+
+Get the current user's profile information.
+
+**Authentication:** Required
+
+**Response (200):**
+
+```json
+{
+  "id": "uuid",
+  "email": "user@example.com",
+  "apiKey": "abc12345****wxyz",
+  "fullApiKey": "abc12345...full_key_here...wxyz",
+  "defaultSettings": {
+    "episodeFilter": "all",
+    "episodeSort": "newest",
+    "dateFormat": "MM/DD/YYYY"
+  },
+  "createdAt": "2025-01-01T00:00:00Z",
+  "hasPassword": true
+}
+```
+
+**Note:** `apiKey` is masked for display, `fullApiKey` contains the complete key for copying.
+
+---
+
+### PATCH /api/profile
+
+Update user profile settings (default episode filter, sort, and date format).
+
+**Authentication:** Required
+
+**Request Body:**
+
+```json
+{
+  "defaultSettings": {
+    "episodeFilter": "all" | "unplayed" | "uncompleted" | "in-progress", // Optional
+    "episodeSort": "newest" | "oldest", // Optional
+    "dateFormat": "MM/DD/YYYY" | "DD/MM/YYYY" | "YYYY-MM-DD" // Optional
+  }
+}
+```
+
+**Response (200):**
+
+```json
+{
+  "success": true,
+  "defaultSettings": {
+    "episodeFilter": "unplayed",
+    "episodeSort": "newest",
+    "dateFormat": "DD/MM/YYYY"
+  }
+}
+```
+
+**Error Responses:**
+- **400:** Invalid request data
+
+---
+
+### POST /api/profile/change-password
+
+Change the user's password.
+
+**Authentication:** Required
+
+**Request Body:**
+
+```json
+{
+  "currentPassword": "old_password", // Required if user already has a password
+  "newPassword": "new_password_min_8_chars"
+}
+```
+
+**Response (200):**
+
+```json
+{
+  "success": true,
+  "message": "Password changed successfully"
+}
+```
+
+**Error Responses:**
+- **400:** Invalid request data / Current password is required
+- **401:** Current password is incorrect
+
+---
+
+### POST /api/profile/regenerate-api-key
+
+Generate a new API key for the user. This invalidates the old API key.
+
+**Authentication:** Required
+
+**Response (200):**
+
+```json
+{
+  "success": true,
+  "apiKey": "new_api_key_here",
+  "message": "API key regenerated successfully. Please update any applications using the old key."
+}
+```
+
+**Warning:** After calling this endpoint, you must use the new API key for all subsequent requests. The old key will no longer work.
+
+---
+
+### POST /api/profile/reset-subscriptions
+
+Delete all subscriptions, queue items, playlists, favorites, and listening history for the user. This action cannot be undone.
+
+**Authentication:** Required
+
+**Response (200):**
+
+```json
+{
+  "success": true,
+  "message": "All subscriptions and related data have been reset",
+  "deleted": {
+    "subscriptions": 5,
+    "queue": 10,
+    "history": 100,
+    "favorites": 20,
+    "playlists": 3,
+    "playlistItems": 25
+  }
+}
+```
+
+**Warning:** This is a destructive operation that permanently deletes all user data except the account itself.
 
 ---
 

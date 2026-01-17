@@ -11,6 +11,7 @@ export default function DocsPage() {
         <h2 className="text-xl font-semibold text-white mb-4">Table of Contents</h2>
         <ul className="space-y-2 text-[#a0a0a0]">
           <li><a href="#authentication" className="hover:text-white transition-colors">Authentication</a></li>
+          <li><a href="#profile" className="hover:text-white transition-colors">Profile</a></li>
           <li><a href="#podcasts" className="hover:text-white transition-colors">Podcasts</a></li>
           <li><a href="#episodes" className="hover:text-white transition-colors">Episodes</a></li>
           <li><a href="#progress" className="hover:text-white transition-colors">Progress</a></li>
@@ -114,6 +115,185 @@ export default function DocsPage() {
                 <li>• <strong>400:</strong> Invalid request data</li>
                 <li>• <strong>401:</strong> Invalid email or password</li>
               </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Profile Section */}
+      <section id="profile" className="mb-12">
+        <h2 className="text-3xl font-bold text-white mb-6">Profile</h2>
+
+        <div className="space-y-8">
+          {/* Get Profile */}
+          <div className="bg-[#1f1f1f] rounded-[20px] p-6 border border-[#2a2a2a]">
+            <div className="flex items-center gap-3 mb-4">
+              <span className="px-3 py-1 bg-[#4CAF50] text-white text-sm font-semibold rounded-[8px]">GET</span>
+              <code className="text-white font-mono text-lg">/api/profile</code>
+              <span className="px-2 py-1 bg-[#FF3B30] text-white text-xs rounded">Auth Required</span>
+            </div>
+            <p className="text-[#a0a0a0] mb-4">Get the current user's profile information.</p>
+            
+            <div className="mb-4">
+              <h4 className="text-white font-semibold mb-2">Response (200):</h4>
+              <pre className="bg-[#1a1a1a] rounded-[8px] p-4 overflow-x-auto border border-[#2a2a2a]">
+                <code className="text-sm text-[#a0a0a0] font-mono">{`{
+  "id": "uuid",
+  "email": "user@example.com",
+  "apiKey": "abc12345****wxyz",
+  "fullApiKey": "abc12345...full_key...wxyz",
+  "defaultSettings": {
+    "episodeFilter": "all",
+    "episodeSort": "newest",
+    "dateFormat": "MM/DD/YYYY"
+  },
+  "createdAt": "2025-01-01T00:00:00Z",
+  "hasPassword": true
+}`}</code>
+              </pre>
+            </div>
+
+            <div className="text-[#a0a0a0] text-sm">
+              <strong>Note:</strong> <code className="text-white">apiKey</code> is masked for display, <code className="text-white">fullApiKey</code> contains the complete key for copying.
+            </div>
+          </div>
+
+          {/* Update Profile */}
+          <div className="bg-[#1f1f1f] rounded-[20px] p-6 border border-[#2a2a2a]">
+            <div className="flex items-center gap-3 mb-4">
+              <span className="px-3 py-1 bg-[#2196F3] text-white text-sm font-semibold rounded-[8px]">PATCH</span>
+              <code className="text-white font-mono text-lg">/api/profile</code>
+              <span className="px-2 py-1 bg-[#FF3B30] text-white text-xs rounded">Auth Required</span>
+            </div>
+            <p className="text-[#a0a0a0] mb-4">Update user profile settings (default episode filter, sort, and date format).</p>
+            
+            <div className="mb-4">
+              <h4 className="text-white font-semibold mb-2">Request Body:</h4>
+              <pre className="bg-[#1a1a1a] rounded-[8px] p-4 overflow-x-auto border border-[#2a2a2a]">
+                <code className="text-sm text-[#a0a0a0] font-mono">{`{
+  "defaultSettings": {
+    "episodeFilter": "all" | "unplayed" | "uncompleted" | "in-progress", // Optional
+    "episodeSort": "newest" | "oldest", // Optional
+    "dateFormat": "MM/DD/YYYY" | "DD/MM/YYYY" | "YYYY-MM-DD" // Optional
+  }
+}`}</code>
+              </pre>
+            </div>
+
+            <div className="mb-4">
+              <h4 className="text-white font-semibold mb-2">Response (200):</h4>
+              <pre className="bg-[#1a1a1a] rounded-[8px] p-4 overflow-x-auto border border-[#2a2a2a]">
+                <code className="text-sm text-[#a0a0a0] font-mono">{`{
+  "success": true,
+  "defaultSettings": {
+    "episodeFilter": "unplayed",
+    "episodeSort": "newest",
+    "dateFormat": "DD/MM/YYYY"
+  }
+}`}</code>
+              </pre>
+            </div>
+
+            <div>
+              <h4 className="text-white font-semibold mb-2">Error Responses:</h4>
+              <ul className="text-[#a0a0a0] text-sm space-y-1 ml-4">
+                <li>• <strong>400:</strong> Invalid request data</li>
+              </ul>
+            </div>
+          </div>
+
+          {/* Change Password */}
+          <div className="bg-[#1f1f1f] rounded-[20px] p-6 border border-[#2a2a2a]">
+            <div className="flex items-center gap-3 mb-4">
+              <span className="px-3 py-1 bg-[#FF3B30] text-white text-sm font-semibold rounded-[8px]">POST</span>
+              <code className="text-white font-mono text-lg">/api/profile/change-password</code>
+              <span className="px-2 py-1 bg-[#FF3B30] text-white text-xs rounded">Auth Required</span>
+            </div>
+            <p className="text-[#a0a0a0] mb-4">Change the user's password.</p>
+            
+            <div className="mb-4">
+              <h4 className="text-white font-semibold mb-2">Request Body:</h4>
+              <pre className="bg-[#1a1a1a] rounded-[8px] p-4 overflow-x-auto border border-[#2a2a2a]">
+                <code className="text-sm text-[#a0a0a0] font-mono">{`{
+  "currentPassword": "old_password", // Required if user has a password
+  "newPassword": "new_password_min_8_chars"
+}`}</code>
+              </pre>
+            </div>
+
+            <div className="mb-4">
+              <h4 className="text-white font-semibold mb-2">Response (200):</h4>
+              <pre className="bg-[#1a1a1a] rounded-[8px] p-4 overflow-x-auto border border-[#2a2a2a]">
+                <code className="text-sm text-[#a0a0a0] font-mono">{`{
+  "success": true,
+  "message": "Password changed successfully"
+}`}</code>
+              </pre>
+            </div>
+
+            <div>
+              <h4 className="text-white font-semibold mb-2">Error Responses:</h4>
+              <ul className="text-[#a0a0a0] text-sm space-y-1 ml-4">
+                <li>• <strong>400:</strong> Invalid request data / Current password is required</li>
+                <li>• <strong>401:</strong> Current password is incorrect</li>
+              </ul>
+            </div>
+          </div>
+
+          {/* Regenerate API Key */}
+          <div className="bg-[#1f1f1f] rounded-[20px] p-6 border border-[#2a2a2a]">
+            <div className="flex items-center gap-3 mb-4">
+              <span className="px-3 py-1 bg-[#FF3B30] text-white text-sm font-semibold rounded-[8px]">POST</span>
+              <code className="text-white font-mono text-lg">/api/profile/regenerate-api-key</code>
+              <span className="px-2 py-1 bg-[#FF3B30] text-white text-xs rounded">Auth Required</span>
+            </div>
+            <p className="text-[#a0a0a0] mb-4">Generate a new API key for the user. This invalidates the old API key.</p>
+            
+            <div className="mb-4">
+              <h4 className="text-white font-semibold mb-2">Response (200):</h4>
+              <pre className="bg-[#1a1a1a] rounded-[8px] p-4 overflow-x-auto border border-[#2a2a2a]">
+                <code className="text-sm text-[#a0a0a0] font-mono">{`{
+  "success": true,
+  "apiKey": "new_api_key_here",
+  "message": "API key regenerated successfully..."
+}`}</code>
+              </pre>
+            </div>
+
+            <div className="bg-[#2a2a2a] rounded-[8px] p-3 text-[#ff9800] text-sm">
+              <strong>Warning:</strong> After calling this endpoint, you must use the new API key for all subsequent requests. The old key will no longer work.
+            </div>
+          </div>
+
+          {/* Reset Subscriptions */}
+          <div className="bg-[#1f1f1f] rounded-[20px] p-6 border border-[#2a2a2a]">
+            <div className="flex items-center gap-3 mb-4">
+              <span className="px-3 py-1 bg-[#FF3B30] text-white text-sm font-semibold rounded-[8px]">POST</span>
+              <code className="text-white font-mono text-lg">/api/profile/reset-subscriptions</code>
+              <span className="px-2 py-1 bg-[#FF3B30] text-white text-xs rounded">Auth Required</span>
+            </div>
+            <p className="text-[#a0a0a0] mb-4">Delete all subscriptions, queue items, playlists, favorites, and listening history for the user.</p>
+            
+            <div className="mb-4">
+              <h4 className="text-white font-semibold mb-2">Response (200):</h4>
+              <pre className="bg-[#1a1a1a] rounded-[8px] p-4 overflow-x-auto border border-[#2a2a2a]">
+                <code className="text-sm text-[#a0a0a0] font-mono">{`{
+  "success": true,
+  "message": "All subscriptions and related data have been reset",
+  "deleted": {
+    "subscriptions": 5,
+    "queue": 10,
+    "history": 100,
+    "favorites": 20,
+    "playlists": 3,
+    "playlistItems": 25
+  }
+}`}</code>
+              </pre>
+            </div>
+
+            <div className="bg-[#2a2a2a] rounded-[8px] p-3 text-[#f44336] text-sm">
+              <strong>Warning:</strong> This is a destructive operation that permanently deletes all user data except the account itself. This action cannot be undone.
             </div>
           </div>
         </div>

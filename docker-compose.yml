@@ -8,7 +8,7 @@ services:
       POSTGRES_PASSWORD: podcast_password
       POSTGRES_DB: podcast_db
     ports:
-      - "5432:5432"
+      - "${POSTGRES_PORT:-5432}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -26,7 +26,7 @@ services:
     container_name: podcast-app
     restart: unless-stopped
     ports:
-      - "3000:3000"
+      - "${APP_PORT:-3000}:3000"
     environment:
       DATABASE_URL: postgresql://podcast_user:podcast_password@postgres:5432/podcast_db
       NODE_ENV: production

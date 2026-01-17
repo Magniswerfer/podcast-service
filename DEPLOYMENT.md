@@ -38,9 +38,14 @@ Portainer supports deploying directly from GitHub repositories using Docker Comp
      ```
    - Or use Portainer's **Environment** section to add them securely
 
-4. **Access your application:**
-   - The app will be available at `http://localhost:3000`
-   - Database is accessible on `localhost:5432`
+4. **Set Ports (Optional):**
+   - Default ports: App on `3000`, Database on `5432`
+   - To change: Add `APP_PORT` and/or `POSTGRES_PORT` environment variables
+   - See "Port Configuration" section below for details
+
+5. **Access your application:**
+   - The app will be available at `http://localhost:${APP_PORT:-3000}`
+   - Database is accessible on `localhost:${POSTGRES_PORT:-5432}`
 
 ## Option 2: Deploy from Local Files
 
@@ -101,9 +106,30 @@ Required environment variables:
 
 Optional environment variables:
 
+- `APP_PORT`: Port for the web application (default: 3000)
+- `POSTGRES_PORT`: External port for PostgreSQL database (default: 5432)
 - `API_KEY_LENGTH`: Length of generated API keys (default: 32)
 - `ITUNES_API_BASE_URL`: iTunes API base URL (default: https://itunes.apple.com)
 - `NODE_ENV`: Set to `production` (automatically set in docker-compose.yml)
+
+### Port Configuration
+
+You can customize the ports by setting environment variables in Portainer:
+
+1. **In Portainer Stack Editor:**
+   - Go to **Stacks** → Your stack → **Editor**
+   - Add to the environment section or use Portainer's **Environment** tab:
+     ```yaml
+     # In docker-compose.yml or as environment variables
+     APP_PORT: 8080        # Change app port from default 3000
+     POSTGRES_PORT: 5433   # Change DB port from default 5432
+     ```
+
+2. **Access your application:**
+   - App: `http://localhost:${APP_PORT}` (default: `http://localhost:3000`)
+   - Database: `localhost:${POSTGRES_PORT}` (default: `localhost:5432`)
+
+**Note:** The internal container ports (3000 for app, 5432 for postgres) remain the same - only the external/host ports are configurable.
 
 ## Database Migrations
 

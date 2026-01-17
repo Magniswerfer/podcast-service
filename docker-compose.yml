@@ -16,6 +16,35 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - podcast-network
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: podcast-app
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgresql://podcast_user:podcast_password@postgres:5432/podcast_db
+      NODE_ENV: production
+      SESSION_SECRET: ${SESSION_SECRET:-change-this-secret-key-in-production}
+      CRON_SECRET: ${CRON_SECRET:-change-this-cron-secret-in-production}
+      API_KEY_LENGTH: ${API_KEY_LENGTH:-32}
+      ITUNES_API_BASE_URL: ${ITUNES_API_BASE_URL:-https://itunes.apple.com}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - podcast-network
+    # Run Prisma migrations on startup
+    command: sh -c "npx prisma migrate deploy && node server.js"
+
+networks:
+  podcast-network:
+    driver: bridge
 
 volumes:
   postgres_data:

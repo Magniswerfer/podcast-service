@@ -47,7 +47,7 @@ export function Player() {
         <div
             className="fixed left-2 right-2 sm:left-4 sm:right-4 lg:left-24 lg:right-4 bg-[#1f1f1f] border border-[#2a2a2a] rounded-[16px] sm:rounded-[20px] shadow-[0_-4px_24px_rgba(0,0,0,0.4)] z-40 transition-all duration-300"
             style={{
-                bottom: 'calc(5rem + var(--safe-area-inset-bottom))',
+                bottom: 'calc(5rem + env(safe-area-inset-bottom, 0px))',
             }}
         >
             <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-3 sm:py-4">

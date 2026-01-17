@@ -8,6 +8,8 @@ import {
     PauseIcon,
     PlayIcon,
     QueueListIcon,
+    ChevronDownIcon,
+    ChevronUpIcon,
 } from "@heroicons/react/24/solid";
 import { ProgressBar } from "./ProgressBar";
 import { Controls } from "./Controls";
@@ -24,12 +26,14 @@ export function Player() {
         duration,
         playbackRate,
         volume,
+        isMinimized,
         togglePlayPause,
         skipForward,
         skipBackward,
         handleSeek,
         setPlaybackRate,
         setVolume,
+        toggleMinimized,
     } = usePlayer();
 
     const [showQueue, setShowQueue] = useState(false);
@@ -43,6 +47,70 @@ export function Player() {
         router.push("/player");
     };
 
+    // Minimized view - compact player
+    if (isMinimized) {
+        return (
+            <div
+                className="fixed left-2 right-2 sm:left-4 sm:right-4 lg:left-24 lg:right-4 bg-[#1f1f1f] border border-[#2a2a2a] rounded-[16px] sm:rounded-[20px] shadow-[0_-4px_24px_rgba(0,0,0,0.4)] z-40 transition-all duration-300"
+                style={{
+                    bottom: 'calc(5rem + env(safe-area-inset-bottom, 0px))',
+                }}
+            >
+                <div className="max-w-7xl mx-auto px-3 sm:px-4 py-2">
+                    <div className="flex items-center gap-3">
+                        {/* Episode Artwork - Clickable */}
+                        <div
+                            className="shrink-0 cursor-pointer"
+                            onClick={handlePlayerClick}
+                        >
+                            <img
+                                src={currentEpisode.artworkUrl ||
+                                    currentEpisode.podcast.artworkUrl ||
+                                    "/placeholder-artwork.png"}
+                                alt={currentEpisode.title}
+                                className="h-10 w-10 sm:h-12 sm:w-12 rounded-[10px] object-cover shadow-lg"
+                            />
+                        </div>
+
+                        {/* Episode Info - Clickable */}
+                        <div
+                            className="flex-1 min-w-0 cursor-pointer"
+                            onClick={handlePlayerClick}
+                        >
+                            <p className="text-xs sm:text-sm font-medium text-white truncate">
+                                {currentEpisode.title}
+                            </p>
+                            <p className="text-xs text-[#a0a0a0] truncate">
+                                {currentEpisode.podcast.title}
+                            </p>
+                        </div>
+
+                        {/* Play/Pause Button */}
+                        <button
+                            onClick={togglePlayPause}
+                            className="p-2 rounded-full bg-[#FF3B30] hover:bg-[#FF5247] text-white shadow-[0_2px_8px_rgba(255,59,48,0.3)] transition-all duration-200 active:scale-95"
+                        >
+                            {isPlaying
+                                ? <PauseIcon className="h-5 w-5" />
+                                : <PlayIcon className="h-5 w-5" />}
+                        </button>
+
+                        {/* Maximize Button */}
+                        <Tooltip content="Expand player" position="top">
+                            <button
+                                onClick={toggleMinimized}
+                                className="p-2 rounded-full text-[#a0a0a0] hover:text-white hover:bg-[#252525] transition-all duration-200 active:scale-95"
+                            >
+                                <ChevronUpIcon className="h-5 w-5" />
+                            </button>
+                        </Tooltip>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    // Maximized view - full player
     return (
         <div
             className="fixed left-2 right-2 sm:left-4 sm:right-4 lg:left-24 lg:right-4 bg-[#1f1f1f] border border-[#2a2a2a] rounded-[16px] sm:rounded-[20px] shadow-[0_-4px_24px_rgba(0,0,0,0.4)] z-40 transition-all duration-300"
@@ -142,6 +210,16 @@ export function Player() {
                             }`}
                         >
                             <QueueListIcon className="h-5 w-5" />
+                        </button>
+                    </Tooltip>
+
+                    {/* Minimize Button */}
+                    <Tooltip content="Minimize player" position="top">
+                        <button
+                            onClick={toggleMinimized}
+                            className="p-2 rounded-full text-[#a0a0a0] hover:text-white hover:bg-[#252525] transition-all duration-200 active:scale-95"
+                        >
+                            <ChevronDownIcon className="h-5 w-5" />
                         </button>
                     </Tooltip>
                 </div>

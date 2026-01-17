@@ -84,6 +84,7 @@ interface PlayerContextType {
   volume: number;
   queue: QueueItem[];
   currentQueueItemId: string | null;
+  isMinimized: boolean;
   setCurrentEpisode: (episode: Episode | null) => void;
   loadEpisode: (episode: Episode) => Promise<void>;
   playEpisode: (episode: Episode, startPosition?: number) => Promise<void>;
@@ -97,6 +98,7 @@ interface PlayerContextType {
   handleSeek: (time: number) => void;
   setPlaybackRate: (rate: number) => void;
   setVolume: (volume: number) => void;
+  toggleMinimized: () => void;
 }
 
 const PlayerContext = createContext<PlayerContextType | undefined>(undefined);
@@ -110,6 +112,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
   const [volume, setVolume] = useState(1);
   const [queue, setQueue] = useState<QueueItem[]>([]);
   const [currentQueueItemId, setCurrentQueueItemId] = useState<string | null>(null);
+  const [isMinimized, setIsMinimized] = useState(false);
   const [alertMessage, setAlertMessage] = useState<string | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
@@ -358,6 +361,10 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     const audio = audioRef.current;
     if (!audio) return;
     audio.currentTime = Math.max(audio.currentTime - 15, 0);
+  };
+
+  const toggleMinimized = () => {
+    setIsMinimized(!isMinimized);
   };
 
   const handleSeek = async (newTime: number) => {
@@ -719,6 +726,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
         volume,
         queue,
         currentQueueItemId,
+        isMinimized,
         setCurrentEpisode,
         loadEpisode,
         playEpisode,
@@ -732,6 +740,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
         handleSeek,
         setPlaybackRate,
         setVolume,
+        toggleMinimized,
       }}
     >
       {children}

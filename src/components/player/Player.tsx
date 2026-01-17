@@ -44,7 +44,12 @@ export function Player() {
     };
 
     return (
-        <div className="fixed bottom-20 left-2 right-2 sm:left-4 sm:right-4 lg:bottom-4 lg:left-24 lg:right-4 bg-[#1f1f1f] border border-[#2a2a2a] rounded-[16px] sm:rounded-[20px] shadow-[0_-4px_24px_rgba(0,0,0,0.4)] z-40 transition-all duration-300">
+        <div
+            className="fixed left-2 right-2 sm:left-4 sm:right-4 lg:left-24 lg:right-4 bg-[#1f1f1f] border border-[#2a2a2a] rounded-[16px] sm:rounded-[20px] shadow-[0_-4px_24px_rgba(0,0,0,0.4)] z-40 transition-all duration-300"
+            style={{
+                bottom: 'calc(5rem + var(--safe-area-inset-bottom))',
+            }}
+        >
             <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-3 sm:py-4">
                 {/* Progress Bar - Full Width */}
                 <div className="mb-3 sm:mb-4">

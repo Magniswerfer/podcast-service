@@ -210,7 +210,12 @@ export function Navigation() {
             </aside>
 
             {/* Mobile Bottom Navigation */}
-            <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-[#1a1a1a] border-t border-[#2a2a2a] z-50 safe-area-inset-bottom">
+            <nav
+                className="lg:hidden fixed bottom-0 left-0 right-0 bg-[#1a1a1a] border-t border-[#2a2a2a] z-50"
+                style={{
+                    paddingBottom: 'var(--safe-area-inset-bottom)',
+                }}
+            >
                 <div
                     ref={navRef}
                     className="flex items-center h-16 px-2 relative"

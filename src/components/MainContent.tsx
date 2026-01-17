@@ -7,11 +7,12 @@ export function MainContent({ children }: { children: React.ReactNode }) {
 
     return (
         <main
-            className={`flex-1 lg:ml-20 transition-[padding] duration-300 ${
-                isPlayerVisible
-                    ? "pb-32 sm:pb-36 lg:pb-28"
-                    : "pb-16 lg:pb-24"
-            }`}
+            className="flex-1 lg:ml-20 transition-[padding] duration-300"
+            style={{
+                paddingBottom: isPlayerVisible
+                    ? 'calc(9rem + var(--safe-area-inset-bottom))'
+                    : 'calc(4rem + var(--safe-area-inset-bottom))',
+            }}
         >
             {children}
         </main>

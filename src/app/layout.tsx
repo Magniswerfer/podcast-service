@@ -4,6 +4,7 @@ import "./globals.css";
 import { Navigation } from "@/components/Navigation";
 import { Player } from "@/components/player/Player";
 import { PlayerProvider } from "@/contexts/PlayerContext";
+import { MainContent } from "@/components/MainContent";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,7 +34,7 @@ export default function RootLayout({
         <PlayerProvider>
           <div className="flex flex-col min-h-screen bg-[#1a1a1a]">
             <Navigation />
-            <main className="flex-1 lg:ml-20 pb-16 lg:pb-24">{children}</main>
+            <MainContent>{children}</MainContent>
             <Player />
           </div>
         </PlayerProvider>

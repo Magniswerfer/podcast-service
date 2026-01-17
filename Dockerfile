@@ -39,8 +39,8 @@ RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
 # Install Prisma CLI for migrations (needed for runtime migrations)
-# Install as root before switching to nextjs user
-RUN npm install -g prisma@latest
+# Pin to same version as package.json to avoid breaking changes
+RUN npm install -g prisma@6.19.2
 
 # Copy necessary files from standalone build
 COPY --from=builder --chown=nextjs:nodejs /app/public ./public

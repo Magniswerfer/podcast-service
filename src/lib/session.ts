@@ -58,9 +58,13 @@ export async function setSession(data: SessionData): Promise<void> {
   const token = await createSession(data);
   const cookieStore = await cookies();
   
+  // Allow disabling secure cookies for local HTTP deployments
+  // Set SECURE_COOKIES=false in environment to allow HTTP
+  const useSecureCookies = process.env.SECURE_COOKIES !== 'false' && process.env.NODE_ENV === 'production';
+  
   cookieStore.set('session', token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
+    secure: useSecureCookies,
     sameSite: 'lax',
     maxAge: 60 * 60 * 24 * 30, // 30 days
     path: '/',

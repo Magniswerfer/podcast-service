@@ -131,7 +131,12 @@ export function Navigation() {
     return (
         <>
             {/* Desktop Sidebar */}
-            <aside className="hidden lg:flex fixed left-0 top-0 h-full w-20 flex-col items-center bg-[#1a1a1a] border-r border-[#2a2a2a] z-40">
+            <aside
+                className="hidden lg:flex fixed left-0 top-0 h-full w-20 flex-col items-center bg-[#1a1a1a] border-r border-[#2a2a2a] z-40"
+                style={{
+                    paddingTop: 'env(safe-area-inset-top, 0px)',
+                }}
+            >
                 {/* Logo */}
                 <div className="flex items-center justify-center h-20 w-full border-b border-[#2a2a2a]">
                     <Link

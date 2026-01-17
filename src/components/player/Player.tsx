@@ -161,13 +161,13 @@ export function Player() {
                         </p>
                     </div>
 
-                    {/* Controls - simplified on mobile */}
+                    {/* Controls - with skip buttons on mobile when maximized */}
                     <div className="flex items-center gap-1 sm:gap-2">
-                        {/* Skip back - hidden on mobile */}
+                        {/* Skip back */}
                         <Tooltip content="Skip backward 15s" position="top">
                             <button
                                 onClick={skipBackward}
-                                className="hidden sm:flex p-2 rounded-full text-[#a0a0a0] hover:text-white hover:bg-[#252525] transition-all duration-200 active:scale-95"
+                                className="p-2 rounded-full text-[#a0a0a0] hover:text-white hover:bg-[#252525] transition-all duration-200 active:scale-95"
                             >
                                 <BackwardIcon className="h-5 w-5" />
                             </button>
@@ -185,11 +185,11 @@ export function Player() {
                                     : <PlayIcon className="h-5 w-5 sm:h-6 sm:w-6" />}
                             </button>
                         </Tooltip>
-                        {/* Skip forward - hidden on mobile */}
+                        {/* Skip forward */}
                         <Tooltip content="Skip forward 15s" position="top">
                             <button
                                 onClick={skipForward}
-                                className="hidden sm:flex p-2 rounded-full text-[#a0a0a0] hover:text-white hover:bg-[#252525] transition-all duration-200 active:scale-95"
+                                className="p-2 rounded-full text-[#a0a0a0] hover:text-white hover:bg-[#252525] transition-all duration-200 active:scale-95"
                             >
                                 <ForwardIcon className="h-5 w-5" />
                             </button>

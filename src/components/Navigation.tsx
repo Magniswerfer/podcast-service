@@ -246,9 +246,6 @@ export function Navigation() {
                                 >
                                     {item.name}
                                 </span>
-                                {isActive && (
-                                    <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-12 h-1 bg-[#FF3B30] rounded-t-full" />
-                                )}
                             </Link>
                         );
                     })}
